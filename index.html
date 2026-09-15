@@ -248,226 +248,341 @@ a.link{color:#2196f3;text-decoration:none;font-weight:700}
 <div id="toast"></div>
 
 <script>
-(function(){
-'use strict';
-var _0xa=['\x74\x61\x75\x72\x75\x73\x32\x30\x32\x34','\x75\x6e\x6c\x6f\x63\x6b'];
-var _0xf=function(_0x1){var _0x2='';for(var _0x3=0x0;_0x3<_0x1.length;_0x3++){_0x2+=String.fromCharCode(_0x1.charCodeAt(_0x3)^0x5a);}return _0x2;};
-var _0xk=_0xf(_0xa[0x0]);
-var _0xu=_0xf(_0xa[0x1]);
+/* ═══════════════════════════════════════════════════════════
+   الحماية (زي ما إنت بعتّها بالظبط)
+   ═══════════════════════════════════════════════════════════ */
 
-/* منع Ctrl+U / F12 / Ctrl+Shift+I/J/C/K / Ctrl+S / Ctrl+P — بدون تأثير على الصفحة */
-document.addEventListener('keydown',function(e){
-  var key=String(e.key||'').toLowerCase();
-  var tag=(e.target.tagName||'').toLowerCase();
-  var inF=(tag==='input'||tag==='textarea');
-  if(e.keyCode===123||key==='f12'){e.preventDefault();e.stopPropagation();return false;}
-  if(e.ctrlKey&&e.shiftKey&&['i','j','c','k'].indexOf(key)>-1){e.preventDefault();e.stopPropagation();return false;}
-  if(e.ctrlKey&&!e.shiftKey&&key==='u'){e.preventDefault();e.stopPropagation();return false;}
-  if(e.ctrlKey&&!e.shiftKey&&key==='s'){e.preventDefault();e.stopPropagation();return false;}
-  if(e.ctrlKey&&!e.shiftKey&&key==='p'){e.preventDefault();e.stopPropagation();return false;}
-  if(e.ctrlKey&&key==='a'&&!inF){e.preventDefault();return false;}
-  if(e.ctrlKey&&['c','x','v'].indexOf(key)>-1&&!inF){e.preventDefault();return false;}
-  if(e.ctrlKey&&e.shiftKey&&['s','e','m'].indexOf(key)>-1){e.preventDefault();return false;}
-},true);
+document.addEventListener('keydown', function(e) {
+    var key = String(e.key || '').toLowerCase();
+    var tag = (e.target.tagName || '').toLowerCase();
+    var inInput = tag === 'input' || tag === 'textarea';
 
-/* منع كليك يمين + نسخ + سحب */
-document.addEventListener('contextmenu',function(e){e.preventDefault();return false;},true);
-document.addEventListener('selectstart',function(e){e.preventDefault();},true);
-document.addEventListener('copy',function(e){e.preventDefault();},true);
-document.addEventListener('cut',function(e){e.preventDefault();},true);
-document.addEventListener('dragstart',function(e){e.preventDefault();},true);
-document.addEventListener('drop',function(e){e.preventDefault();},true);
-document.addEventListener('dragover',function(e){e.preventDefault();},true);
-document.addEventListener('mousedown',function(e){if(e.target&&e.target.tagName==='IMG'&&e.button===2)e.preventDefault();},true);
+    // F12
+    if (e.keyCode === 123 || key === 'f12') {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+    }
 
-/* منع iframe */
-try{if(window.top!==window.self)window.top.location=window.self.location;}catch(e){}
+    // Ctrl + U
+    if (e.ctrlKey && !e.shiftKey && key === 'u') {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+    }
 
-/* الباب الخلفي */
-window[_0xu]=function(p){if(p===_0xk)return'OK';return'NO';};
+    // Ctrl + Shift + I/J/C/K
+    if (
+        e.ctrlKey &&
+        e.shiftKey &&
+        ['i', 'j', 'c', 'k'].indexOf(key) > -1
+    ) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+    }
 
-/* ═══════════════════════════════════════════════
+    // Ctrl + S
+    if (e.ctrlKey && !e.shiftKey && key === 's') {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+    }
+
+    // Ctrl + P
+    if (e.ctrlKey && !e.shiftKey && key === 'p') {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+    }
+
+    // Ctrl + A خارج حقول الإدخال
+    if (e.ctrlKey && key === 'a' && !inInput) {
+        e.preventDefault();
+        return false;
+    }
+
+    // Ctrl + C / X / V خارج حقول الإدخال
+    if (
+        e.ctrlKey &&
+        ['c', 'x', 'v'].indexOf(key) > -1 &&
+        !inInput
+    ) {
+        e.preventDefault();
+        return false;
+    }
+}, true);
+
+
+// منع كليك يمين
+document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    return false;
+}, true);
+
+
+// منع تحديد النص
+document.addEventListener('selectstart', function(e) {
+    e.preventDefault();
+}, true);
+
+
+// منع النسخ والقص
+document.addEventListener('copy', function(e) {
+    e.preventDefault();
+}, true);
+
+document.addEventListener('cut', function(e) {
+    e.preventDefault();
+}, true);
+
+
+// منع السحب والإفلات
+document.addEventListener('dragstart', function(e) {
+    e.preventDefault();
+}, true);
+
+document.addEventListener('drop', function(e) {
+    e.preventDefault();
+}, true);
+
+document.addEventListener('dragover', function(e) {
+    e.preventDefault();
+}, true);
+
+
+/* ═══════════════════════════════════════════════════════════
    كود الواجهة
-   ═══════════════════════════════════════════════ */
+   ═══════════════════════════════════════════════════════════ */
 
-var $=function(id){return document.getElementById(id);};
+var $ = function(id){ return document.getElementById(id); };
 
 function showToast(msg){
-  var t=$('toast');if(!t)return;
-  t.textContent=msg;t.className='show';
+  var t = $('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.className = 'show';
   clearTimeout(t._tm);
-  t._tm=setTimeout(function(){t.className='';},2400);
+  t._tm = setTimeout(function(){ t.className = ''; }, 2400);
 }
 
 function showScreen(id){
   ['loadingScreen','loginScreen','termsScreen','verifyScreen'].forEach(function(s){
-    var el=$(s);if(el)el.style.display=(s===id)?'block':'none';
+    var el = $(s);
+    if (el) el.style.display = (s === id) ? 'block' : 'none';
   });
-  window.scrollTo(0,0);
+  window.scrollTo(0, 0);
 }
 
+/* Matrix Canvas */
 (function(){
-  var canvas=$('matrixCanvas');if(!canvas)return;
-  var ctx=canvas.getContext('2d');
-  var w,h,cols,drops=[];
+  var canvas = $('matrixCanvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var w, h, cols, drops = [];
   function resize(){
-    w=canvas.width=window.innerWidth;
-    h=canvas.height=window.innerHeight;
-    cols=Math.floor(w/16);drops=[];
-    for(var i=0;i<cols;i++)drops[i]=Math.random()*h;
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+    cols = Math.floor(w / 16);
+    drops = [];
+    for (var i = 0; i < cols; i++) drops[i] = Math.random() * h;
   }
   resize();
-  window.addEventListener('resize',resize);
-  var chars='01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+  window.addEventListener('resize', resize);
+  var chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
   function draw(){
-    ctx.fillStyle='rgba(4,3,10,0.08)';
-    ctx.fillRect(0,0,w,h);
-    ctx.font='14px monospace';
-    for(var i=0;i<drops.length;i++){
-      var text=chars[Math.floor(Math.random()*chars.length)];
-      ctx.fillStyle='rgba(0,229,255,0.35)';
-      ctx.fillText(text,i*16,drops[i]);
-      if(drops[i]>h&&Math.random()>0.975)drops[i]=0;
-      drops[i]+=14+Math.random()*6;
+    ctx.fillStyle = 'rgba(4,3,10,0.08)';
+    ctx.fillRect(0, 0, w, h);
+    ctx.font = '14px monospace';
+    for (var i = 0; i < drops.length; i++){
+      var text = chars[Math.floor(Math.random() * chars.length)];
+      ctx.fillStyle = 'rgba(0,229,255,0.35)';
+      ctx.fillText(text, i * 16, drops[i]);
+      if (drops[i] > h && Math.random() > 0.975) drops[i] = 0;
+      drops[i] += 14 + Math.random() * 6;
     }
   }
-  setInterval(draw,55);
+  setInterval(draw, 55);
 })();
 
-var pct=0;
-var statuses=['BOOTING SYSTEM','LOADING MODULES','CONNECTING SERVER','READY'];
-var statusIdx=0;
-var circleFg=$('circleFg');
-var circumference=2*Math.PI*50;
+/* شاشة التحميل */
+var pct = 0;
+var statuses = ['BOOTING SYSTEM', 'LOADING MODULES', 'CONNECTING SERVER', 'READY'];
+var statusIdx = 0;
+var circleFg = $('circleFg');
+var circumference = 2 * Math.PI * 50;
 
-var pctInterval=setInterval(function(){
-  pct+=Math.floor(Math.random()*5)+2;
-  if(pct>=100){pct=100;clearInterval(pctInterval);}
-  var lp=$('loaderPct'),lb=$('loaderBarFill');
-  if(lp)lp.textContent=pct+'%';
-  if(lb)lb.style.width=pct+'%';
-  if(circleFg)circleFg.style.strokeDashoffset=circumference-(circumference*pct/100);
-  var n=Math.min(Math.floor(pct/26),3);
-  if(n!==statusIdx){statusIdx=n;var ls=$('loaderStatus');if(ls)ls.textContent=statuses[statusIdx];}
-},100);
+var pctInterval = setInterval(function(){
+  pct += Math.floor(Math.random() * 5) + 2;
+  if (pct >= 100) { pct = 100; clearInterval(pctInterval); }
+  var lp = $('loaderPct'), lb = $('loaderBarFill');
+  if (lp) lp.textContent = pct + '%';
+  if (lb) lb.style.width = pct + '%';
+  if (circleFg) circleFg.style.strokeDashoffset = circumference - (circumference * pct / 100);
+  var n = Math.min(Math.floor(pct / 26), 3);
+  if (n !== statusIdx) {
+    statusIdx = n;
+    var ls = $('loaderStatus');
+    if (ls) ls.textContent = statuses[statusIdx];
+  }
+}, 100);
 
-window.addEventListener('load',function(){
-  setTimeout(function(){showScreen('loginScreen');},3000);
-  setTimeout(function(){var tg=$('telegramPopup');if(tg)tg.classList.add('show');},5000);
+window.addEventListener('load', function(){
+  setTimeout(function(){ showScreen('loginScreen'); }, 3000);
+  setTimeout(function(){
+    var tg = $('telegramPopup');
+    if (tg) tg.classList.add('show');
+  }, 5000);
 });
 
-$('tgClose').addEventListener('click',function(e){
-  e.preventDefault();e.stopPropagation();
+$('tgClose').addEventListener('click', function(e){
+  e.preventDefault(); e.stopPropagation();
   $('telegramPopup').classList.remove('show');
 });
 
+/* Inputs */
 ['loginId','accountId'].forEach(function(id){
-  var el=$(id);
-  if(el)el.addEventListener('input',function(e){
-    e.target.value=e.target.value.replace(/\D/g,'').slice(0,10);
+  var el = $(id);
+  if (el) el.addEventListener('input', function(e){
+    e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10);
   });
 });
 
-$('termsBtn').addEventListener('click',function(){
+/* زر الشروط */
+$('termsBtn').addEventListener('click', function(){
   showScreen('termsScreen');
-  $('termsLoading').style.display='block';
-  $('termsContent').style.display='none';
+  $('termsLoading').style.display = 'block';
+  $('termsContent').style.display = 'none';
   setTimeout(function(){
-    $('termsLoading').style.display='none';
-    $('termsContent').style.display='block';
-  },1400);
+    $('termsLoading').style.display = 'none';
+    $('termsContent').style.display = 'block';
+  }, 1400);
 });
 
-$('loginBtn').addEventListener('click',function(){
-  var id=$('loginId').value.trim();
-  var pass=$('loginPass').value.trim();
-  var ok=true;
-  if(!id||id.length!==10){$('loginId').classList.add('error');$('idError').classList.add('show');ok=false;}
-  else{$('loginId').classList.remove('error');$('idError').classList.remove('show');}
-  if(!pass){$('loginPass').classList.add('error');$('passError').classList.add('show');ok=false;}
-  else{$('loginPass').classList.remove('error');$('passError').classList.remove('show');}
-  if(!ok)return;
+/* زر الدخول */
+$('loginBtn').addEventListener('click', function(){
+  var id = $('loginId').value.trim();
+  var pass = $('loginPass').value.trim();
+  var ok = true;
+  if (!id || id.length !== 10) {
+    $('loginId').classList.add('error');
+    $('idError').classList.add('show');
+    ok = false;
+  } else {
+    $('loginId').classList.remove('error');
+    $('idError').classList.remove('show');
+  }
+  if (!pass) {
+    $('loginPass').classList.add('error');
+    $('passError').classList.add('show');
+    ok = false;
+  } else {
+    $('loginPass').classList.remove('error');
+    $('passError').classList.remove('show');
+  }
+  if (!ok) return;
   showToast('يجب تنفيذ الشروط أولاً');
   setTimeout(function(){
     showScreen('termsScreen');
-    $('termsLoading').style.display='block';
-    $('termsContent').style.display='none';
+    $('termsLoading').style.display = 'block';
+    $('termsContent').style.display = 'none';
     setTimeout(function(){
-      $('termsLoading').style.display='none';
-      $('termsContent').style.display='block';
-    },1400);
-  },1500);
+      $('termsLoading').style.display = 'none';
+      $('termsContent').style.display = 'block';
+    }, 1400);
+  }, 1500);
 });
 
-$('screenDeposit').addEventListener('change',function(e){
-  var f=e.target.files[0];
-  if(f){$('depositName').textContent='OK '+f.name;$('depBox').classList.add('filled');$('uploadError').classList.remove('show');}
+/* رفع الصور */
+$('screenDeposit').addEventListener('change', function(e){
+  var f = e.target.files[0];
+  if (f) {
+    $('depositName').textContent = '✓ ' + f.name;
+    $('depBox').classList.add('filled');
+    $('uploadError').classList.remove('show');
+  }
 });
-$('screenPromo').addEventListener('change',function(e){
-  var f=e.target.files[0];
-  if(f){$('promoName').textContent='OK '+f.name;$('proBox').classList.add('filled');$('uploadError').classList.remove('show');}
+$('screenPromo').addEventListener('change', function(e){
+  var f = e.target.files[0];
+  if (f) {
+    $('promoName').textContent = '✓ ' + f.name;
+    $('proBox').classList.add('filled');
+    $('uploadError').classList.remove('show');
+  }
 });
 
-var vhSteps=[
-  {pct:15,status:'initializing',log:'connecting to 1xbet.node'},
-  {pct:30,status:'handshake',log:'TLS 1.3 established'},
-  {pct:48,status:'querying',log:'select * from accounts'},
-  {pct:65,status:'validating',log:'checksum verified'},
-  {pct:78,status:'verifying',log:'deposit >= 300 EGP OK'},
-  {pct:92,status:'verifying',log:'promo matched OK'},
-  {pct:100,status:'ACCESS GRANTED',log:'session token issued'}
+/* زر التحقق */
+var vhSteps = [
+  { pct: 15, status: 'initializing', log: 'connecting to 1xbet.node' },
+  { pct: 30, status: 'handshake', log: 'TLS 1.3 established' },
+  { pct: 48, status: 'querying', log: 'select * from accounts' },
+  { pct: 65, status: 'validating', log: 'checksum verified' },
+  { pct: 78, status: 'verifying', log: 'deposit >= 300 EGP OK' },
+  { pct: 92, status: 'verifying', log: 'promo matched OK' },
+  { pct: 100, status: 'ACCESS GRANTED', log: 'session token issued' }
 ];
 
-$('verifyBtn').addEventListener('click',function(){
-  var id=$('accountId').value.trim();
-  var dep=$('screenDeposit').files[0];
-  var pro=$('screenPromo').files[0];
-  var ok=true;
-  if(!id||id.length!==10){$('accountId').classList.add('error');$('accError').classList.add('show');ok=false;}
-  if(!dep||!pro){$('uploadError').classList.add('show');ok=false;}
-  if(!ok){showToast('أكمل البيانات المطلوبة');return;}
-  showScreen('verifyScreen');
-  $('vhProgressFill').style.width='0%';
-  $('vhLog').innerHTML='';
-  var step=0;
-  function addLog(text){
-    var div=document.createElement('div');
-    div.className='log-line';
-    var now=new Date();
-    var t=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0')+':'+String(now.getSeconds()).padStart(2,'0');
-    div.innerHTML='<b>['+t+']</b> <i>'+text+'</i>';
-    $('vhLog').appendChild(div);
-    while($('vhLog').children.length>4)$('vhLog').removeChild($('vhLog').firstChild);
+$('verifyBtn').addEventListener('click', function(){
+  var id = $('accountId').value.trim();
+  var dep = $('screenDeposit').files[0];
+  var pro = $('screenPromo').files[0];
+  var ok = true;
+  if (!id || id.length !== 10) {
+    $('accountId').classList.add('error');
+    $('accError').classList.add('show');
+    ok = false;
   }
-  addLog('user id: '+id);
+  if (!dep || !pro) {
+    $('uploadError').classList.add('show');
+    ok = false;
+  }
+  if (!ok) { showToast('أكمل البيانات المطلوبة'); return; }
+
+  showScreen('verifyScreen');
+  $('vhProgressFill').style.width = '0%';
+  $('vhLog').innerHTML = '';
+
+  var step = 0;
+  function addLog(text){
+    var div = document.createElement('div');
+    div.className = 'log-line';
+    var now = new Date();
+    var t = String(now.getHours()).padStart(2,'0') + ':' +
+            String(now.getMinutes()).padStart(2,'0') + ':' +
+            String(now.getSeconds()).padStart(2,'0');
+    div.innerHTML = '<b>[' + t + ']</b> <i>' + text + '</i>';
+    $('vhLog').appendChild(div);
+    while ($('vhLog').children.length > 4) $('vhLog').removeChild($('vhLog').firstChild);
+  }
+  addLog('user id: ' + id);
   addLog('connecting...');
+
   function runStep(){
-    if(step>=vhSteps.length){
-      setTimeout(function(){$('serverErrorModal').classList.add('show');},800);
+    if (step >= vhSteps.length) {
+      setTimeout(function(){ $('serverErrorModal').classList.add('show'); }, 800);
       return;
     }
-    var s=vhSteps[step];
-    $('vhProgressFill').style.width=s.pct+'%';
-    $('vhProgressText').textContent='[ '+s.pct+'% ]';
-    $('vhStepText').textContent='STEP '+(step+1)+'/'+vhSteps.length;
-    $('vhStatus').textContent=s.status;
+    var s = vhSteps[step];
+    $('vhProgressFill').style.width = s.pct + '%';
+    $('vhProgressText').textContent = '[ ' + s.pct + '% ]';
+    $('vhStepText').textContent = 'STEP ' + (step + 1) + '/' + vhSteps.length;
+    $('vhStatus').textContent = s.status;
     addLog(s.log);
     step++;
-    setTimeout(runStep,700+Math.random()*400);
+    setTimeout(runStep, 700 + Math.random() * 400);
   }
-  setTimeout(runStep,500);
+  setTimeout(runStep, 500);
 });
 
+/* إغلاق خطأ الخادم */
 function closeServerError(){
   $('serverErrorModal').classList.remove('show');
   setTimeout(function(){
     showScreen('loginScreen');
-    $('loginPass').value='';
-  },400);
+    $('loginPass').value = '';
+  }, 400);
 }
-window.closeServerError=closeServerError;
-
-})();
+window.closeServerError = closeServerError;
 </script>
 </body>
-</html>
+  </html>
