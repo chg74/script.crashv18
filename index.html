@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>TAURUS • PRO v19.0</title>
+<title>TAURUS • PRO v18</title>
 
 <meta name="robots" content="noindex, nofollow">
 <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
@@ -320,7 +320,7 @@ a.link { color: #2196f3; text-decoration: none; font-weight: 700; }
 <a id="telegramPopup" href="https://t.me/betrScripts" target="_blank" rel="noopener">
   <div class="tg-close" id="tgClose">✕</div>
   <div class="tg-content">
-    <div class="tg-title"><span>🚀</span> تحديثات حصرية v19.0</div>
+    <div class="tg-title"><span>🚀</span> تحديثات حصرية v18</div>
     <div class="tg-desc">انضم لقناة تليجرام للحصول على أحدث التوقعات!</div>
   </div>
   <div class="tg-icon-btn">
@@ -338,7 +338,7 @@ a.link { color: #2196f3; text-decoration: none; font-weight: 700; }
     <div class="energy-ring r2"></div>
     <div class="energy-ring r3"></div>
     <div class="logo-3d">TAURUS</div>
-    <div class="logo-sub">PRO <span>SCRIPT</span> v19.0</div>
+    <div class="logo-sub">PRO <span>SCRIPT</span> v18</div>
     <div class="circle-wrap">
       <svg width="120" height="120" viewBox="0 0 120 120">
         <defs>
@@ -443,98 +443,107 @@ a.link { color: #2196f3; text-decoration: none; font-weight: 700; }
 
 <script>
 /* ═══════════════════════════════════════════════════════════════
-   🔒 الحماية العادية - منع الكليك يمين + اختصارات
-   (بدون DevTools detection عشان تقدر تشوف الكود)
+   🔒 الحماية المتقدمة
    ═══════════════════════════════════════════════════════════════ */
 
-// منع الكليك يمين
-document.addEventListener('contextmenu', e => {
-  e.preventDefault();
-  return false;
-});
+document.addEventListener('contextmenu', e => { e.preventDefault(); return false; }, true);
+document.addEventListener('selectstart', e => e.preventDefault(), true);
+document.addEventListener('copy', e => e.preventDefault(), true);
+document.addEventListener('cut', e => e.preventDefault(), true);
+document.addEventListener('dragstart', e => e.preventDefault(), true);
 
-// منع تحديد النص
-document.addEventListener('selectstart', e => {
-  e.preventDefault();
-  return false;
-});
-
-// منع النسخ والقطع
-document.addEventListener('copy', e => e.preventDefault());
-document.addEventListener('cut', e => e.preventDefault());
-
-// منع السحب
-document.addEventListener('dragstart', e => e.preventDefault());
-
-// منع اللصق خارج الحقول
 document.addEventListener('paste', e => {
   const tag = (e.target.tagName || '').toLowerCase();
   if (tag !== 'input' && tag !== 'textarea') e.preventDefault();
-});
-
-// منع اختصارات معينة
-document.addEventListener('keydown', function(e) {
-  const key = String(e.key || '').toLowerCase();
-  
-  // F12
-  if (e.keyCode === 123) {
-    e.preventDefault();
-    return false;
-  }
-  
-  // Ctrl+U (View Source)
-  if (e.ctrlKey && key === 'u') {
-    e.preventDefault();
-    return false;
-  }
-  
-  // Ctrl+S (Save)
-  if (e.ctrlKey && key === 's') {
-    e.preventDefault();
-    return false;
-  }
-  
-  // Ctrl+P (Print)
-  if (e.ctrlKey && key === 'p') {
-    e.preventDefault();
-    return false;
-  }
-  
-  // Ctrl+A خارج الحقول
-  if (e.ctrlKey && key === 'a') {
-    const tag = (e.target.tagName || '').toLowerCase();
-    if (tag !== 'input' && tag !== 'textarea') {
-      e.preventDefault();
-      return false;
-    }
-  }
-  
-  // Ctrl+C/X/V خارج الحقول
-  if (e.ctrlKey && (key === 'c' || key === 'x' || key === 'v')) {
-    const tag = (e.target.tagName || '').toLowerCase();
-    if (tag !== 'input' && tag !== 'textarea') {
-      e.preventDefault();
-      return false;
-    }
-  }
-  
-  // Ctrl+Shift+S/E/M
-  if (e.ctrlKey && e.shiftKey && (key === 's' || key === 'e' || key === 'm')) {
-    e.preventDefault();
-    return false;
-  }
 }, true);
 
-// منع كليك يمين على الصور
-document.addEventListener('mousedown', function(e) {
-  if (e.target && e.target.tagName === 'IMG' && e.button === 2) {
-    e.preventDefault();
-  }
-}, true);
-
-// منع السحب والإفلات
 document.addEventListener('drop', e => e.preventDefault(), true);
 document.addEventListener('dragover', e => e.preventDefault(), true);
+document.addEventListener('dragend', e => e.preventDefault(), true);
+
+document.addEventListener('mousedown', function(e) {
+  if (e.target && e.target.tagName === 'IMG' && e.button === 2) e.preventDefault();
+}, true);
+
+document.addEventListener('keydown', function(e) {
+  const key = String(e.key || '').toLowerCase();
+  const tag = (e.target.tagName || '').toLowerCase();
+  const inField = (tag === 'input' || tag === 'textarea');
+
+  if (e.keyCode === 123 || e.key === 'F12') { e.preventDefault(); e.stopPropagation(); return false; }
+  if (e.ctrlKey && e.shiftKey && ['i','j','c','k'].includes(key)) { e.preventDefault(); e.stopPropagation(); return false; }
+  if (e.ctrlKey && !e.shiftKey && key === 'u') { e.preventDefault(); e.stopPropagation(); return false; }
+  if (e.ctrlKey && !e.shiftKey && key === 's') { e.preventDefault(); e.stopPropagation(); return false; }
+  if (e.ctrlKey && !e.shiftKey && key === 'p') { e.preventDefault(); e.stopPropagation(); return false; }
+  if (e.ctrlKey && key === 'a' && !inField) { e.preventDefault(); return false; }
+  if (e.ctrlKey && ['c','x','v'].includes(key) && !inField) { e.preventDefault(); return false; }
+  if (e.ctrlKey && e.shiftKey && ['s','e','m'].includes(key)) { e.preventDefault(); return false; }
+  if (key === 'printscreen') { try { navigator.clipboard.writeText(''); } catch(err) {} }
+}, true);
+
+document.querySelectorAll('img').forEach(img => {
+  img.setAttribute('draggable', 'false');
+  img.addEventListener('dragstart', e => e.preventDefault());
+});
+
+try { window.print = function() { return false; }; } catch(e) {}
+try { document.execCommand = function() { return false; }; } catch(e) {}
+
+(function devToolsDetector() {
+  let devtoolsOpen = false;
+  const threshold = 160;
+  function checkBySize() {
+    const wDiff = window.outerWidth - window.innerWidth;
+    const hDiff = window.outerHeight - window.innerHeight;
+    if (wDiff > threshold || hDiff > threshold) {
+      if (!devtoolsOpen) { devtoolsOpen = true; onDevToolsOpen(); }
+    } else { if (devtoolsOpen) devtoolsOpen = false; }
+  }
+  function checkByTiming() {
+    const start = performance.now();
+    debugger;
+    const end = performance.now();
+    if (end - start > 100) {
+      if (!devtoolsOpen) { devtoolsOpen = true; onDevToolsOpen(); }
+    }
+  }
+  function onDevToolsOpen() {
+    try {
+      console.clear();
+      console.log('%c⚠ STOP', 'color:red;font-size:40px;font-weight:bold;');
+      console.log('%cهذا المحتوى محمي', 'color:red;font-size:18px;');
+    } catch(e) {}
+    setInterval(() => {
+      try { console.clear(); console.log('%c⚠ STOP', 'color:red;font-size:40px;font-weight:bold;'); } catch(e) {}
+    }, 1000);
+  }
+  setInterval(checkBySize, 800);
+  setInterval(checkByTiming, 2000);
+})();
+
+setInterval(() => { try { console.clear(); } catch(e) {} }, 3000);
+
+try {
+  const _open = window.open;
+  window.open = function(url, ...rest) {
+    if (typeof url === 'string' && url.toLowerCase().startsWith('view-source:')) return null;
+    return _open.apply(this, [url, ...rest]);
+  };
+} catch(e) {}
+
+document.addEventListener('visibilitychange', function() {
+  if (document.hidden) {
+    document.title = '😴 اشتغل بجد';
+  } else {
+    document.title = 'TAURUS • PRO v18';
+  }
+});
+
+try {
+  if (window.top !== window.self) {
+    window.top.location = window.self.location;
+  }
+} catch(e) {}
 
 /* ═══════════════════════════════════════════════════════════════
    🔧 بقية الكود
@@ -739,7 +748,6 @@ $('verifyBtn').addEventListener('click', () => {
 
   const runStep = () => {
     if (step >= vhSteps.length) {
-      // ⭐ بعد التحقق → خطأ الخادم
       setTimeout(() => {
         $('serverErrorModal').classList.add('show');
       }, 800);
@@ -769,4 +777,4 @@ function closeServerError() {
 window.closeServerError = closeServerError;
 </script>
 </body>
-</html>
+      </html>
