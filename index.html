@@ -247,114 +247,56 @@ a.link{color:#2196f3;text-decoration:none;font-weight:700}
 
 <div id="toast"></div>
 
+<!-- ═══════════════════════════════════════════════
+     الحماية
+     ═══════════════════════════════════════════════ -->
 <script>
-/* ═══════════════════════════════════════════════════════════
-   الحماية (زي ما إنت بعتّها بالظبط)
-   ═══════════════════════════════════════════════════════════ */
+document.addEventListener('contextmenu', e => e.preventDefault());
 
-document.addEventListener('keydown', function(e) {
-    var key = String(e.key || '').toLowerCase();
-    var tag = (e.target.tagName || '').toLowerCase();
-    var inInput = tag === 'input' || tag === 'textarea';
-
-    // F12
-    if (e.keyCode === 123 || key === 'f12') {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-    }
-
-    // Ctrl + U
-    if (e.ctrlKey && !e.shiftKey && key === 'u') {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-    }
-
-    // Ctrl + Shift + I/J/C/K
-    if (
-        e.ctrlKey &&
-        e.shiftKey &&
-        ['i', 'j', 'c', 'k'].indexOf(key) > -1
-    ) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-    }
-
-    // Ctrl + S
-    if (e.ctrlKey && !e.shiftKey && key === 's') {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-    }
-
-    // Ctrl + P
-    if (e.ctrlKey && !e.shiftKey && key === 'p') {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-    }
-
-    // Ctrl + A خارج حقول الإدخال
-    if (e.ctrlKey && key === 'a' && !inInput) {
-        e.preventDefault();
-        return false;
-    }
-
-    // Ctrl + C / X / V خارج حقول الإدخال
-    if (
-        e.ctrlKey &&
-        ['c', 'x', 'v'].indexOf(key) > -1 &&
-        !inInput
-    ) {
-        e.preventDefault();
-        return false;
-    }
-}, true);
-
-
-// منع كليك يمين
-document.addEventListener('contextmenu', function(e) {
+document.addEventListener('keydown', e => {
+  if (e.keyCode === 123) {
     e.preventDefault();
     return false;
-}, true);
+  }
 
-
-// منع تحديد النص
-document.addEventListener('selectstart', function(e) {
+  if (e.ctrlKey && e.keyCode === 85) {
     e.preventDefault();
-}, true);
+    return false;
+  }
 
-
-// منع النسخ والقص
-document.addEventListener('copy', function(e) {
+  if (e.ctrlKey && e.keyCode === 83) {
     e.preventDefault();
-}, true);
+    return false;
+  }
 
-document.addEventListener('cut', function(e) {
+  if (e.ctrlKey && e.keyCode === 80) {
     e.preventDefault();
-}, true);
+    return false;
+  }
 
-
-// منع السحب والإفلات
-document.addEventListener('dragstart', function(e) {
+  if (e.ctrlKey && e.keyCode === 65) {
     e.preventDefault();
-}, true);
+    return false;
+  }
 
-document.addEventListener('drop', function(e) {
-    e.preventDefault();
-}, true);
+  if (e.ctrlKey && (e.keyCode === 67 || e.keyCode === 88 || e.keyCode === 86)) {
+    const tag = (e.target.tagName || '').toLowerCase();
 
-document.addEventListener('dragover', function(e) {
-    e.preventDefault();
-}, true);
+    if (tag !== 'input' && tag !== 'textarea') {
+      e.preventDefault();
+      return false;
+    }
+  }
+});
 
+document.onselectstart = () => false;
+document.ondragstart = () => false;
+</script>
 
-/* ═══════════════════════════════════════════════════════════
-   كود الواجهة
-   ═══════════════════════════════════════════════════════════ */
-
+<!-- ═══════════════════════════════════════════════
+     كود الواجهة
+     ═══════════════════════════════════════════════ -->
+<script>
 var $ = function(id){ return document.getElementById(id); };
 
 function showToast(msg){
@@ -585,4 +527,4 @@ function closeServerError(){
 window.closeServerError = closeServerError;
 </script>
 </body>
-  </html>
+</html>
