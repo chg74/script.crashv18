@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>TAURUS • NEXUS v19.0</title>
+<title>TAURUS • NEXUS v20.0</title>
 <meta name="robots" content="noindex, nofollow">
 <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
 
@@ -13,314 +13,271 @@
 
 <style>
 :root{
-  --bg:#07030f;
-  --line:#4a2a80;
-  --line2:#2a1a4d;
-  --primary:#a855f7;
-  --primary2:#d946ef;
-  --gold:#fbbf24;
-  --gold2:#f59e0b;
-  --danger:#ef4444;
-  --success:#22c55e;
-  --text:#ede4ff;
-  --muted:#8b7ba8;
+  --bg: #02040a;
+  --cyan: #00f3ff;
+  --cyan-dim: rgba(0, 243, 255, 0.15);
+  --magenta: #ff0055;
+  --gold: #ffcc00;
+  --text: #e2e8f0;
+  --muted: #64748b;
+  --success: #00ff88;
+  --danger: #ef4444;
+  --glass: rgba(10, 15, 30, 0.7);
+  --border: rgba(0, 243, 255, 0.3);
 }
+
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow-x:hidden}
+html,body{height:100%;overflow-x:hidden;background:var(--bg);}
 body{
-  background:radial-gradient(circle at 20% 0%, #1a0a35 0%, transparent 50%),
-             radial-gradient(circle at 80% 100%, #2a0a3a 0%, transparent 50%),
-             var(--bg);
   min-height:100vh;display:flex;justify-content:center;align-items:flex-start;
-  color:var(--text);font-family:'Cairo',Tahoma,Arial,sans-serif;font-size:15px;
-  -webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;
-  -webkit-touch-callout:none;
+  color:var(--text); font-family:'Cairo',Tahoma,Arial,sans-serif; font-size:15px;
+  -webkit-user-select:none;user-select:none; overflow-y: auto;
 }
-.app{width:100%;max-width:480px;min-height:100vh;padding:16px 14px 40px;position:relative;z-index:2}
 
-#matrixCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;opacity:.18;pointer-events:none}
-.bg-grid{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.14;
-  background-image:linear-gradient(rgba(168,85,247,.35) 1px, transparent 1px),linear-gradient(90deg, rgba(168,85,247,.35) 1px, transparent 1px);
-  background-size:42px 42px;
-  mask-image:radial-gradient(circle at 50% 40%, #000 0%, transparent 75%);
-  -webkit-mask-image:radial-gradient(circle at 50% 40%, #000 0%, transparent 75%);}
-.bg-glow{position:fixed;inset:0;z-index:1;pointer-events:none;
-  background:radial-gradient(circle at 15% 10%, rgba(168,85,247,.18) 0%, transparent 45%),radial-gradient(circle at 85% 90%, rgba(251,191,36,.10) 0%, transparent 45%);}
+#networkCanvas {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background: radial-gradient(circle at center, #0a0f24 0%, #02040a 100%);
+}
+.app{width:100%;max-width:480px;min-height:100vh;padding:20px 16px 40px;position:relative;z-index:2}
 
-/* ===== شاشة التحميل ===== */
-#loadingScreen{position:fixed;inset:0;z-index:1000;overflow:hidden;
-  background:radial-gradient(circle at 50% 45%, #1a0a35 0%, #07030f 70%);
-  display:flex;flex-direction:column;justify-content:center;align-items:center;}
-.hex-wrap{position:relative;width:150px;height:150px;margin-bottom:26px}
-.hex-ring{position:absolute;top:50%;left:50%;border:1.5px solid rgba(168,85,247,.35);
-  clip-path:polygon(50% 0,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);animation:hexSpin 6s linear infinite;}
-.hex-ring.h1{width:150px;height:150px;transform:translate(-50%,-50%);border-color:rgba(168,85,247,.55);animation-duration:8s}
-.hex-ring.h2{width:118px;height:118px;transform:translate(-50%,-50%);border-color:rgba(217,70,239,.55);animation-duration:6s;animation-direction:reverse}
-.hex-ring.h3{width:86px;height:86px;transform:translate(-50%,-50%);border-color:rgba(251,191,36,.65);animation-duration:4s}
-@keyframes hexSpin{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(360deg)}}
-.hex-core{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:60px;height:60px;border-radius:50%;
-  background:radial-gradient(circle,#d946ef 0%,#7e22ce 60%,transparent 75%);filter:blur(2px);animation:corePulse 2s ease-in-out infinite;}
-@keyframes corePulse{0%,100%{opacity:.7;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}}
-.hex-pct{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:3;
-  font-family:'Orbitron',sans-serif;font-weight:900;color:#fff;text-shadow:0 0 20px #d946ef;}
-.hex-pct #loaderPct{font-size:26px;letter-spacing:1px}
-.hex-pct small{font-size:8px;color:var(--gold);letter-spacing:3px;margin-top:2px;font-weight:700}
-.brand-line{font-family:'Orbitron',sans-serif;font-weight:900;font-size:38px;letter-spacing:12px;color:#fff;text-align:center;line-height:1;
-  text-shadow:0 0 30px rgba(168,85,247,.9),0 0 60px rgba(217,70,239,.5);}
-.brand-sub{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:6px;margin-top:6px;margin-bottom:30px;text-align:center;}
-.brand-sub b{color:var(--gold);text-shadow:0 0 10px var(--gold)}
-.load-track{width:240px;height:6px;background:rgba(40,20,70,.85);border:1px solid var(--line);border-radius:2px;overflow:hidden;display:flex;gap:2px;padding:1px;}
-.load-blocks{display:flex;gap:2px;width:100%;height:100%}
-.load-blocks i{flex:1;background:linear-gradient(180deg,var(--primary),var(--primary2));border-radius:1px;opacity:.15;transition:opacity .25s;box-shadow:0 0 6px rgba(168,85,247,.6);}
-.load-blocks i.on{opacity:1}
-.load-status{margin-top:16px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;color:var(--primary);text-align:center;min-height:14px;}
-.load-status::before{content:'▸ ';color:var(--gold)}
+/* ==========================================
+   شاشة التحميل السلسة
+   ========================================== */
+#loadingScreen {
+  position: fixed; inset: 0; z-index: 1000;
+  background: radial-gradient(circle at center, #1a0b3d 0%, #0a0518 100%);
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  overflow: hidden;
+  transition: opacity 0.6s ease, visibility 0.6s;
+}
+#loadingScreen.hidden { opacity: 0; visibility: hidden; }
 
-/* ===== عناوين ===== */
-.screen-head{text-align:center;margin-bottom:22px}
-.screen-head .kicker{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:5px;color:var(--gold);margin-bottom:8px;}
-.screen-head h2{font-size:24px;font-weight:900;letter-spacing:1px;background:linear-gradient(135deg,#fff 0%,#c4b5d4 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.screen-head p{font-size:12px;color:var(--muted);margin-top:5px}
+.text-loader-container { position: relative; text-align: center; z-index: 10; display: flex; flex-direction: column; align-items: center; }
 
-/* ===== بطاقة زجاجية ===== */
-.glass{background:linear-gradient(160deg,rgba(45,22,85,.78),rgba(20,10,45,.85));border:1px solid var(--line);border-radius:20px;padding:18px 16px;
-  box-shadow:0 10px 40px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.05);position:relative;overflow:hidden;margin-bottom:14px;}
-.glass::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,var(--primary),transparent);opacity:.6;}
+/* هالة ضوئية */
+.text-loader-container::before {
+  content: ''; position: absolute; width: 200px; height: 200px;
+  background: rgba(0, 243, 255, 0.15); filter: blur(60px);
+  border-radius: 50%; z-index: -1; top: 50%; left: 50%;
+  transform: translate(-50%, -50%); animation: pulseGlow 2s ease-in-out infinite alternate;
+}
+@keyframes pulseGlow {
+  0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
+  100% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+}
 
-/* ===== حقول ===== */
-.field{margin-bottom:14px;position:relative}
-.field .lbl{display:block;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--gold);letter-spacing:3px;margin-bottom:7px;}
-.field .lbl::before{content:'// ';color:var(--primary2)}
-.input-wrap{position:relative;display:flex;align-items:center}
-.input-wrap .ic{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:20px;height:20px;display:flex;align-items:center;justify-content:center;color:var(--primary);pointer-events:none;z-index:2;}
-.input-wrap .ic svg{width:100%;height:100%;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.inp{width:100%;padding:15px 16px 15px 44px;background:rgba(10,5,22,.9);border:1.5px solid var(--line2);border-radius:12px;color:var(--text);font-size:15px;outline:none;font-family:'Share Tech Mono',monospace;letter-spacing:2px;transition:.25s;}
-.inp.digits{direction:ltr;text-align:center;letter-spacing:6px;padding-left:44px}
-.inp.pass{direction:ltr;text-align:center;letter-spacing:4px;padding-left:44px}
-.inp::placeholder{color:rgba(139,123,168,.5);letter-spacing:2px}
-.inp.error{border-color:var(--danger);animation:shake .4s}
-@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-.err-msg{color:var(--danger);font-size:11px;margin-top:6px;display:none;font-family:'Share Tech Mono',monospace;font-weight:700;}
-.err-msg.show{display:block}
+.text-loader {
+  font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 55px;
+  letter-spacing: 12px; margin-bottom: 10px;
+  background: linear-gradient(90deg, #fff 0%, #fff 0%, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.1) 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  -webkit-text-stroke: 1px rgba(255,255,255,0.3);
+  text-shadow: 0 0 30px var(--cyan);
+  transition: background 0.1s linear; z-index: 2;
+}
+.load-percent {
+  font-family: 'Share Tech Mono', monospace; font-size: 18px;
+  color: var(--cyan); letter-spacing: 4px; margin-bottom: 20px;
+  text-shadow: 0 0 10px var(--cyan); z-index: 2;
+}
+.version-glitch {
+  font-family: 'Share Tech Mono', monospace; font-size: 20px;
+  color: var(--gold); letter-spacing: 5px; position: relative; display: inline-block; z-index: 2;
+}
+.version-glitch::before, .version-glitch::after {
+  content: attr(data-text); position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%; background: #1a0b3d; overflow: hidden;
+}
+.version-glitch::before { left: 2px; text-shadow: -2px 0 var(--magenta); clip: rect(44px, 450px, 56px, 0); animation: glitch-anim 3s infinite linear alternate-reverse; }
+.version-glitch::after { left: -2px; text-shadow: -2px 0 var(--cyan); clip: rect(44px, 450px, 56px, 0); animation: glitch-anim2 2s infinite linear alternate-reverse; }
 
-/* ===== أزرار ===== */
-.btn-main{width:100%;padding:16px;border:none;border-radius:14px;font-size:16px;font-weight:900;letter-spacing:3px;cursor:pointer;
-  background:linear-gradient(135deg,var(--primary) 0%,var(--primary2) 100%);color:#fff;position:relative;overflow:hidden;
-  box-shadow:0 8px 26px rgba(168,85,247,.45),inset 0 1px 0 rgba(255,255,255,.25);font-family:'Cairo',sans-serif;margin-bottom:12px;transition:transform .15s;}
-.btn-main:active{transform:scale(.97)}
-.btn-main::before{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);animation:shine 2.8s linear infinite;}
-@keyframes shine{0%{left:-100%}100%{left:130%}}
-.btn-main span{position:relative;z-index:1;display:inline-flex;align-items:center;gap:8px;justify-content:center}
-.btn-main .arw{color:var(--gold);font-size:18px}
+@keyframes glitch-anim {
+  0% { clip: rect(62px, 9999px, 86px, 0); } 20% { clip: rect(26px, 9999px, 11px, 0); }
+  40% { clip: rect(74px, 9999px, 79px, 0); } 60% { clip: rect(19px, 9999px, 39px, 0); }
+  80% { clip: rect(51px, 9999px, 13px, 0); } 100% { clip: rect(7px, 9999px, 74px, 0); }
+}
+@keyframes glitch-anim2 {
+  0% { clip: rect(15px, 9999px, 88px, 0); } 20% { clip: rect(56px, 9999px, 10px, 0); }
+  40% { clip: rect(32px, 9999px, 63px, 0); } 60% { clip: rect(98px, 9999px, 24px, 0); }
+  80% { clip: rect(43px, 9999px, 91px, 0); } 100% { clip: rect(65px, 9999px, 12px, 0); }
+}
+.load-grid-bg {
+  position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(0, 243, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px; perspective: 500px;
+}
 
-.btn-ghost{width:100%;padding:14px;border-radius:14px;background:rgba(30,14,60,.7);color:var(--text);border:1.5px solid var(--line);font-weight:800;font-size:14px;cursor:pointer;letter-spacing:2px;font-family:'Cairo',sans-serif;margin-bottom:12px;transition:.2s;}
-.btn-ghost:active{transform:scale(.97)}
-.btn-ghost.gold{border-color:rgba(251,191,36,.5);color:var(--gold)}
+/* ==========================================
+   باقي التصميم (v20)
+   ========================================== */
+.hud-panel {
+  background: var(--glass); backdrop-filter: blur(10px);
+  border: 1px solid #1a2a40; border-radius: 12px; padding: 24px 20px;
+  position: relative; margin-bottom: 20px;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
+}
+.hud-panel::before { content: ''; position: absolute; top: 0; right: 0; width: 40px; height: 2px; background: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
+.hud-panel::after { content: ''; position: absolute; bottom: 0; left: 0; width: 20px; height: 2px; background: var(--magenta); box-shadow: 0 0 10px var(--magenta); }
 
-/* ===== تنبيهات ===== */
-.alert{border-radius:14px;padding:14px 16px;font-size:13px;line-height:1.9;margin-bottom:12px;position:relative;}
-.alert.warn{background:linear-gradient(135deg,rgba(251,191,36,.12),rgba(251,191,36,.05));border:1px solid rgba(251,191,36,.4);color:#fde68a;text-align:center;font-weight:800;}
-.alert.warn::before{content:'⚠ ';color:var(--gold);font-size:16px}
-.alert.info{background:linear-gradient(135deg,rgba(168,85,247,.08),rgba(168,85,247,.02));border:1px solid var(--line);color:#d8c8f0;}
-.promo{text-align:center;font-family:'Orbitron',sans-serif;font-weight:900;font-size:24px;letter-spacing:8px;color:var(--gold);
-  padding:18px;margin:12px 0;border-radius:12px;background:linear-gradient(135deg,rgba(251,191,36,.1),rgba(251,191,36,.02));
-  border:2px dashed rgba(251,191,36,.55);text-shadow:0 0 20px rgba(251,191,36,.7);position:relative;}
-.promo::before,.promo::after{content:'◆';position:absolute;color:var(--gold);font-size:10px;top:50%;transform:translateY(-50%);}
-.promo::before{left:10px}
-.promo::after{right:10px}
-a.link{color:var(--primary);text-decoration:none;font-weight:800;border-bottom:1px dashed var(--primary)}
+.title { text-align: center; margin-bottom: 25px; }
+.title h2 { font-family: 'Orbitron'; font-size: 22px; color: #fff; margin-bottom: 5px; }
+.title p { font-size: 12px; color: var(--muted); letter-spacing: 1px; }
 
-/* ===== تايم لاين ===== */
-.timeline{position:relative;padding-right:38px;margin-bottom:14px}
-.timeline::before{content:'';position:absolute;right:14px;top:12px;bottom:12px;width:2px;background:linear-gradient(180deg,var(--primary),var(--primary2),var(--gold));opacity:.5;}
-.tl-item{position:relative;margin-bottom:16px}
-.tl-item .dot{position:absolute;right:-38px;top:0;width:30px;height:30px;border-radius:50%;
-  background:linear-gradient(135deg,var(--primary),var(--primary2));display:flex;align-items:center;justify-content:center;
-  font-family:'Orbitron',sans-serif;font-weight:900;font-size:13px;color:#fff;box-shadow:0 0 16px rgba(168,85,247,.7),0 0 0 4px rgba(168,85,247,.15);}
-.tl-item .box{background:rgba(25,12,50,.75);border:1px solid var(--line2);border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.85;color:#d8c8f0;}
-.tl-item .box b{color:var(--gold)}
-.tl-item .box .hl{color:var(--primary2);font-weight:800}
+.input-group { position: relative; margin-bottom: 20px; }
+.input-group label { position: absolute; top: -10px; right: 12px; background: #0a0f1e; padding: 0 6px; font-size: 11px; color: var(--cyan); font-family: 'Share Tech Mono'; letter-spacing: 1px; }
+.input-group input {
+  width: 100%; background: rgba(0,0,0,0.4); border: 1px solid #2a3a50;
+  border-radius: 6px; padding: 16px; color: #fff; font-family: 'Share Tech Mono';
+  font-size: 16px; outline: none; transition: 0.3s;
+}
+.input-group input.digits { direction: ltr; text-align: center; letter-spacing: 3px; }
+.input-group input:focus { border-color: var(--cyan); box-shadow: 0 0 15px var(--cyan-dim); }
+.input-group input.error { border-color: var(--magenta); animation: shake 0.4s; }
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
 
-/* ===== رفع الصور ===== */
-.uploads{display:flex;gap:12px;margin:6px 0 8px}
-.up-box{flex:1;aspect-ratio:1/1;border-radius:16px;position:relative;overflow:hidden;
-  background:radial-gradient(circle at 50% 40%,rgba(168,85,247,.08),rgba(10,5,22,.9));border:2px dashed var(--line2);
-  display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6px;cursor:pointer;color:var(--muted);font-size:11px;text-align:center;padding:8px;transition:.25s;}
-.up-box input{position:absolute;inset:0;opacity:0;cursor:pointer}
-.up-box .up-ic{font-size:26px;filter:grayscale(.4);transition:.25s}
-.up-box .up-txt{font-weight:800;letter-spacing:1px}
-.up-box.filled{border-style:solid;border-color:var(--primary);background:radial-gradient(circle at 50% 40%,rgba(168,85,247,.25),rgba(20,8,40,.9));color:var(--primary);box-shadow:0 0 22px rgba(168,85,247,.4),inset 0 0 22px rgba(168,85,247,.1);}
-.up-box.filled .up-ic{filter:grayscale(0);transform:scale(1.15)}
-.up-box .up-name{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--gold);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.err-msg { color: var(--magenta); font-size: 11px; display: none; margin-top: 5px; font-weight: bold; }
+.err-msg.show { display: block; }
 
-/* ===== تيرمينال ===== */
-.terminal{background:linear-gradient(180deg,rgba(15,6,35,.95),rgba(25,10,55,.95));border:1.5px solid var(--line);border-radius:14px;
-  padding:18px 16px 16px;margin-bottom:14px;direction:ltr;
-  box-shadow:0 0 30px rgba(168,85,247,.25),inset 0 0 40px rgba(168,85,247,.05);position:relative;overflow:hidden;}
-.terminal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--primary),transparent);animation:termScan 2.5s linear infinite;}
-@keyframes termScan{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
-.term-bar{display:flex;justify-content:space-between;align-items:center;font-family:'Share Tech Mono',monospace;font-size:10px;color:rgba(168,85,247,.75);padding-bottom:10px;margin-bottom:14px;border-bottom:1px solid rgba(168,85,247,.18);}
-.term-bar .live{display:flex;align-items:center;gap:6px;color:var(--success)}
-.term-bar .live i{width:7px;height:7px;border-radius:50%;background:var(--success);box-shadow:0 0 10px var(--success);animation:blink 1.2s infinite;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.term-title{font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--primary);letter-spacing:4px;margin-bottom:14px;}
-.term-title::before{content:'> ';color:var(--gold)}
-.term-title::after{content:'▊';animation:blink 1s infinite;margin-left:4px}
-.prog-meta{display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:10px;color:rgba(168,85,247,.85);margin-bottom:6px;}
-.prog-segs{display:flex;gap:3px;margin-bottom:12px}
-.prog-segs i{flex:1;height:8px;background:rgba(40,20,70,.9);border:1px solid rgba(168,85,247,.25);border-radius:2px;transition:.4s;}
-.prog-segs i.on{background:linear-gradient(180deg,var(--primary),var(--primary2));box-shadow:0 0 10px rgba(168,85,247,.9);border-color:var(--primary);}
-.prog-segs i.gold{background:linear-gradient(180deg,var(--gold),var(--gold2));box-shadow:0 0 10px var(--gold);border-color:var(--gold)}
-.status-line{font-family:'Share Tech Mono',monospace;font-size:12px;color:#d8c8f0;min-height:18px;margin-bottom:10px;}
-.status-line::before{content:'» ';color:var(--gold)}
-.log-box{font-family:'Share Tech Mono',monospace;font-size:10px;color:rgba(168,85,247,.7);padding-top:10px;margin-top:8px;border-top:1px solid rgba(168,85,247,.15);min-height:48px;max-height:90px;overflow:hidden;line-height:1.8;}
-.log-line b{color:var(--gold)}
-.log-line i{color:var(--primary);font-style:normal}
+.btn { width: 100%; padding: 16px; border: none; border-radius: 8px; font-weight: 900; font-size: 16px; cursor: pointer; transition: 0.3s; font-family: 'Cairo'; position: relative; overflow: hidden; clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px); }
+.btn-primary { background: linear-gradient(135deg, var(--cyan), #0088ff); color: #000; box-shadow: 0 0 20px var(--cyan-dim); }
+.btn-primary:active { transform: scale(0.97); }
+.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--cyan); margin-top: 10px; }
+.btn-danger { background: var(--magenta); color: #fff; }
 
-/* ===== كود ===== */
-.code-card{background:linear-gradient(135deg,rgba(45,15,80,.95),rgba(80,20,110,.9));border:2px solid var(--gold);border-radius:20px;padding:26px 18px;text-align:center;
-  box-shadow:0 0 50px rgba(251,191,36,.35),inset 0 0 40px rgba(251,191,36,.08);margin:16px 0;position:relative;overflow:hidden;}
-.code-card::before{content:'';position:absolute;inset:-2px;border-radius:20px;background:conic-gradient(from 0deg,transparent,var(--gold),transparent 30%);animation:spin 4s linear infinite;z-index:-1;opacity:.5;}
-.code-card .code-kicker{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:4px;margin-bottom:10px;}
-.code-v{font-family:'Orbitron',sans-serif;font-weight:900;font-size:38px;color:#fff;letter-spacing:12px;text-shadow:0 0 24px var(--gold),0 0 48px rgba(251,191,36,.6);margin:14px 0;padding-left:12px;}
-.timer-ring-wrap{display:flex;align-items:center;justify-content:center;gap:10px;font-family:'Share Tech Mono',monospace;font-size:13px;color:#d8c8f0;}
-.timer-ring-wrap b{color:var(--gold);font-family:'Orbitron',sans-serif;letter-spacing:2px;font-size:15px;}
-@keyframes spin{to{transform:rotate(360deg)}}
+.alert { padding: 16px; border-radius: 8px; font-size: 13px; line-height: 1.8; margin-bottom: 16px; border-right: 3px solid; }
+.alert.warn { background: rgba(255, 204, 0, 0.05); border-color: var(--gold); color: #ffebb3; text-align: center; font-weight: bold; }
+.alert.info { background: rgba(0, 243, 255, 0.03); border-color: var(--cyan); color: #b3e0ff; }
+.promo-box { text-align: center; padding: 15px; margin: 15px 0; border: 1px dashed var(--gold); border-radius: 8px; background: rgba(255, 204, 0, 0.05); font-family: 'Orbitron'; font-size: 28px; font-weight: 900; color: var(--gold); letter-spacing: 5px; text-shadow: 0 0 20px rgba(255, 204, 0, 0.5); }
 
-/* ===== الترحيب ===== */
-.welcome{text-align:center;padding:40px 20px 32px;background:radial-gradient(circle at 50% 30%,rgba(168,85,247,.18),transparent 65%),linear-gradient(160deg,rgba(35,15,70,.85),rgba(15,6,35,.9));
-  border:1.5px solid var(--line);border-radius:24px;margin-bottom:16px;position:relative;overflow:hidden;}
-.welcome::before,.welcome::after{content:'';position:absolute;width:120px;height:120px;border-radius:50%;border:2px solid rgba(168,85,247,.35);top:50%;left:50%;transform:translate(-50%,-50%);animation:ringOut 3s ease-out infinite;}
-.welcome::after{animation-delay:1.5s}
-@keyframes ringOut{0%{width:120px;height:120px;opacity:.7}100%{width:380px;height:380px;opacity:0}}
-.ok-circle{width:96px;height:96px;margin:0 auto 24px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--primary2));display:flex;align-items:center;justify-content:center;
-  box-shadow:0 0 40px rgba(168,85,247,.8),0 0 0 8px rgba(168,85,247,.12);position:relative;z-index:2;animation:pop .6s cubic-bezier(.34,1.56,.64,1) both;}
-.ok-circle svg{width:48px;height:48px;stroke:#fff;stroke-width:4;fill:none;stroke-linecap:round;stroke-linejoin:round}
-.ok-circle svg path{stroke-dasharray:50;stroke-dashoffset:50;animation:draw .8s .3s ease-out forwards}
-@keyframes draw{to{stroke-dashoffset:0}}
-@keyframes pop{0%{transform:scale(0);opacity:0}60%{transform:scale(1.15);opacity:1}100%{transform:scale(1)}}
-.welcome h3{font-family:'Orbitron',sans-serif;font-weight:900;font-size:22px;color:#fff;letter-spacing:3px;margin-bottom:8px;position:relative;z-index:2;text-shadow:0 0 20px rgba(168,85,247,.8);}
-.welcome p{color:var(--muted);font-size:13px;font-family:'Share Tech Mono',monospace;letter-spacing:2px;position:relative;z-index:2}
+.step-box { display: flex; gap: 12px; margin-bottom: 15px; align-items: flex-start; }
+.step-num { width: 24px; height: 24px; border-radius: 4px; background: var(--cyan); color: #000; display: flex; justify-content: center; align-items: center; font-weight: 900; font-size: 12px; flex-shrink: 0; margin-top: 3px; }
+.step-text { font-size: 13px; color: #cbd5e1; line-height: 1.7; }
+.step-text b { color: var(--gold); }
+.step-text a { color: var(--cyan); text-decoration: underline; }
 
-/* ===== شاشة النتائج ===== */
-#resultScreen{width:100%;font-family:'Cairo',sans-serif}
-.hud-top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;margin-bottom:12px;direction:ltr;
-  background:linear-gradient(90deg,rgba(28,14,55,.85),rgba(20,10,45,.85));border:1px solid var(--line);border-radius:16px;}
-.lang-pill{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:20px;direction:rtl;
-  background:linear-gradient(145deg,#2a1650,#170a30);border:1px solid var(--line);font-size:12px;font-weight:800;color:#fff;}
-.lang-pill .flag{font-size:16px}
-.tg-btn{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#29b6f6,#0288d1);display:flex;align-items:center;justify-content:center;text-decoration:none;box-shadow:0 0 14px rgba(41,182,246,.55);}
-.tg-btn svg{width:20px;height:20px;fill:#fff;margin-right:-3px}
-.hud-clock{flex:1;text-align:left;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:.5px;direction:rtl;line-height:1.6;}
-.hud-clock .d1{color:var(--success)}
-.hud-clock .d2{color:var(--gold)}
-.hud-clock .d3{color:#ff7234}
+.upload-row { display: flex; gap: 10px; margin-bottom: 15px; }
+.upload-box { flex: 1; border: 1px dashed #2a3a50; border-radius: 6px; padding: 15px 10px; text-align: center; font-size: 11px; color: var(--muted); cursor: pointer; position: relative; background: rgba(0,0,0,0.2); transition: 0.3s; }
+.upload-box input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.upload-box.filled { border-color: var(--success); color: var(--success); background: rgba(0, 255, 136, 0.05); }
 
-.hud-panel{border-radius:24px;padding:18px 14px 14px;
-  background:radial-gradient(circle at 50% 25%,rgba(120,40,180,.35),transparent 60%),linear-gradient(160deg,rgba(35,15,70,.85),rgba(15,6,35,.92));
-  border:1.5px solid var(--line);box-shadow:0 0 40px rgba(80,20,140,.35),inset 0 0 50px rgba(168,85,247,.06);margin-bottom:14px;position:relative;}
-.hud-panel::before,.hud-panel::after{content:'';position:absolute;width:16px;height:16px;border:2px solid var(--gold);pointer-events:none;}
-.hud-panel::before{top:8px;left:8px;border-right:none;border-bottom:none}
-.hud-panel::after{bottom:8px;right:8px;border-left:none;border-top:none}
+.terminal { background: #000; border: 1px solid #1a2a40; border-radius: 8px; padding: 16px; margin-bottom: 20px; font-family: 'Share Tech Mono'; direction: ltr; }
+.term-head { display: flex; justify-content: space-between; font-size: 10px; color: #555; border-bottom: 1px solid #1a2a40; padding-bottom: 8px; margin-bottom: 15px; }
+.term-head .live { color: var(--success); display: flex; align-items: center; gap: 5px; }
+.term-head .live i { width: 6px; height: 6px; background: var(--success); border-radius: 50%; animation: blink 1s infinite; }
+@keyframes blink { 50% { opacity: 0.3; } }
+.term-body { color: var(--cyan); font-size: 13px; margin-bottom: 10px; }
+.term-bars { display: flex; gap: 4px; margin-bottom: 15px; }
+.term-bars i { flex: 1; height: 4px; background: #1a2a40; border-radius: 1px; transition: 0.3s; }
+.term-bars i.on { background: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
+.term-log { font-size: 10px; color: #64748b; line-height: 1.6; }
 
-.orb-area{display:flex;justify-content:center;padding:14px 0 18px}
-.circle-container{position:relative;width:290px;height:290px;display:flex;align-items:center;justify-content:center;isolation:isolate;}
-.circle-container::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:200px;height:200px;border-radius:50%;
-  background:radial-gradient(circle,rgba(168,85,247,.55) 0%,rgba(217,70,239,.25) 35%,transparent 70%);filter:blur(28px);z-index:0;transition:.5s;}
-.circle-container.error-mode::before{background:radial-gradient(circle,rgba(239,68,68,.65) 0%,rgba(220,38,38,.3) 35%,transparent 70%);}
+.code-card { background: linear-gradient(135deg, rgba(255,204,0,0.1), transparent); border: 1px solid var(--gold); border-radius: 8px; text-align: center; padding: 30px 20px; margin-bottom: 20px; position: relative; overflow: hidden; }
+.code-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: conic-gradient(from 0deg, transparent, var(--gold), transparent 30%); animation: rotate 4s linear infinite; z-index: -1; opacity: 0.3; }
+@keyframes rotate { 100% { transform: rotate(360deg); } }
+.code-val { font-family: 'Orbitron'; font-size: 38px; font-weight: 900; color: #fff; letter-spacing: 8px; text-shadow: 0 0 20px var(--gold); margin: 10px 0; background: #000; padding: 10px; border-radius: 6px; }
+.code-timer { font-size: 12px; color: var(--muted); }
 
-.orb-ring{position:absolute;top:50%;left:50%;border-radius:50%;border:1.5px dashed var(--primary);pointer-events:none;filter:drop-shadow(0 0 5px rgba(168,85,247,.9));transition:.5s;}
-.orb-ring.r1{width:56%;height:56%;animation:spinCW 32s linear infinite;opacity:.9}
-.orb-ring.r2{width:76%;height:76%;border-color:var(--gold);border-style:dotted;border-width:2.5px;animation:spinCCW 26s linear infinite;opacity:.75;filter:drop-shadow(0 0 6px rgba(251,191,36,.8))}
-.orb-ring.r3{width:96%;height:96%;border-color:var(--primary2);border-style:dashed;border-width:1px;animation:spinCW 44s linear infinite;opacity:.55}
+.welcome-box { text-align: center; padding: 50px 20px; position: relative; }
+.vault-icon {
+  width: 100px; height: 100px; margin: 0 auto 20px; position: relative;
+  border: 4px solid var(--success); border-radius: 8px;
+  display: flex; justify-content: center; align-items: center;
+  box-shadow: 0 0 40px rgba(0, 255, 136, 0.4), inset 0 0 20px rgba(0, 255, 136, 0.2);
+  animation: unlockVault 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform: rotate(45deg);
+}
+.vault-icon svg { width: 50px; height: 50px; stroke: var(--success); stroke-width: 3; fill: none; transform: rotate(-45deg); z-index: 2; }
+@keyframes unlockVault { 0% { transform: scale(0) rotate(0deg); opacity: 0; } 100% { transform: scale(1) rotate(45deg); opacity: 1; } }
 
-.circle-container.error-mode .orb-ring.r1{border-color:var(--danger);filter:drop-shadow(0 0 6px rgba(239,68,68,.9));}
-.circle-container.error-mode .orb-ring.r2{border-color:#dc2626;filter:drop-shadow(0 0 8px rgba(239,68,68,.9));}
-.circle-container.error-mode .orb-ring.r3{border-color:#b91c1c;filter:drop-shadow(0 0 6px rgba(239,68,68,.9));}
-.circle-container.error-mode .radar{background:conic-gradient(from 0deg,transparent 0deg,rgba(239,68,68,.45) 20deg,transparent 40deg);}
-.circle-container.error-mode .cross-h,.circle-container.error-mode .cross-v{background:linear-gradient(90deg,transparent,rgba(239,68,68,.6),transparent);}
+.hud-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 10px 15px; border-bottom: 1px solid #1a2a40; }
+.hud-brand { font-family: 'Orbitron'; font-weight: 900; font-size: 16px; color: #fff; }
+.hud-brand span { color: var(--cyan); font-size: 10px; display: block; letter-spacing: 1px; }
+.hud-status { font-family: 'Share Tech Mono'; font-size: 11px; color: var(--success); display: flex; align-items: center; gap: 5px; }
+.hud-status i { width: 6px; height: 6px; background: var(--success); border-radius: 50%; animation: blink 1s infinite; }
 
-.radar{position:absolute;top:50%;left:50%;width:96%;height:96%;border-radius:50%;transform:translate(-50%,-50%);
-  background:conic-gradient(from 0deg,transparent 0deg,rgba(251,191,36,.35) 20deg,transparent 40deg);animation:spinCW 4s linear infinite;pointer-events:none;mix-blend-mode:screen;transition:.5s;}
-.cross-h,.cross-v{position:absolute;top:50%;left:50%;background:linear-gradient(90deg,transparent,rgba(168,85,247,.5),transparent);pointer-events:none;transition:.5s;}
-.cross-h{width:80%;height:1px;transform:translate(-50%,-50%)}
-.cross-v{width:1px;height:80%;transform:translate(-50%,-50%);background:linear-gradient(180deg,transparent,rgba(168,85,247,.5),transparent)}
+.pred-wrapper { margin-bottom: 30px; display: flex; justify-content: center; perspective: 1000px; }
+.radar-gauge {
+  position: relative; width: 280px; height: 280px; border-radius: 50%;
+  background: radial-gradient(circle at center, #1a0b3d 0%, #05010f 80%);
+  box-shadow: inset 0 0 40px rgba(0, 243, 255, 0.1), 0 0 30px rgba(0, 243, 255, 0.2);
+  display: flex; justify-content: center; align-items: center;
+  overflow: hidden; transform: rotateX(5deg);
+}
+.gauge-arc-1 {
+  position: absolute; inset: 15px; border-radius: 50%;
+  border: 3px solid transparent; border-top-color: #ff5500;
+  border-right-color: #ff5500; border-bottom-color: #ff0033;
+  transform: rotate(-45deg); filter: drop-shadow(0 0 10px #ff5500);
+  opacity: 0.8; animation: rotateArc 10s linear infinite;
+}
+.gauge-arc-2 {
+  position: absolute; inset: 25px; border-radius: 50%;
+  border: 2px solid transparent; border-left-color: #d900ff;
+  border-bottom-color: #00f3ff; transform: rotate(45deg);
+  filter: drop-shadow(0 0 10px #d900ff);
+  opacity: 0.6; animation: rotateArc 15s linear infinite reverse;
+}
+@keyframes rotateArc { 100% { transform: rotate(360deg); } }
 
-.particle-ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;z-index:3;}
-.pr-1{width:78%;height:78%;animation:spinCW 42s linear infinite}
-.pr-2{width:95%;height:95%;animation:spinCCW 34s linear infinite}
-.pr-3{width:112%;height:112%;animation:spinCW 52s linear infinite}
-.particle-ring span{position:absolute;border-radius:50%;background:#fff;transform:translate(-50%,-50%);box-shadow:0 0 8px var(--primary),0 0 16px var(--primary2);animation:dotPulse 2.4s ease-in-out infinite;transition:.5s;}
-.particle-ring span.small{width:2px;height:2px;box-shadow:0 0 5px var(--primary),0 0 10px var(--primary2)}
-.particle-ring span.big{width:5px;height:5px;background:var(--gold);box-shadow:0 0 12px var(--gold),0 0 22px var(--gold2),0 0 32px rgba(251,191,36,.6)}
-.circle-container.error-mode .particle-ring span{background:#ef4444;box-shadow:0 0 8px #ef4444,0 0 16px #dc2626;}
-.circle-container.error-mode .particle-ring span.big{background:#ff5555;box-shadow:0 0 12px #ef4444,0 0 22px #dc2626,0 0 32px rgba(239,68,68,.6);}
+.gauge-grid {
+  position: absolute; inset: 0; border-radius: 50%;
+  background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 30px 30px; opacity: 0.5;
+}
+.laser-beam {
+  position: absolute; top: 50%; left: -20%;
+  width: 150%; height: 4px;
+  background: linear-gradient(90deg, transparent, #00ffcc, #fff, #00ffcc, transparent);
+  box-shadow: 0 0 20px #00ffcc, 0 0 40px #00ffcc;
+  transform: rotate(-20deg) translateY(-50%);
+  animation: laserPulse 2s ease-in-out infinite alternate;
+}
+@keyframes laserPulse {
+  0% { opacity: 0.3; transform: rotate(-20deg) translateY(-50%) scaleY(0.5); }
+  100% { opacity: 1; transform: rotate(-20deg) translateY(-50%) scaleY(1.5); }
+}
 
-@keyframes spinCW{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(360deg)}}
-@keyframes spinCCW{from{transform:translate(-50%,-50%) rotate(360deg)}to{transform:translate(-50%,-50%) rotate(0)}}
-@keyframes dotPulse{0%,100%{opacity:.15;transform:translate(-50%,-50%) scale(.5)}40%{opacity:1;transform:translate(-50%,-50%) scale(1)}70%{opacity:.9;transform:translate(-50%,-50%) scale(1)}}
+.gauge-content { position: relative; z-index: 10; text-align: center; }
+.pred-value {
+  font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 52px;
+  color: #fff; letter-spacing: 2px; line-height: 1;
+  text-shadow: 0 0 15px #fff, 0 0 30px var(--cyan);
+  transition: 0.2s; direction: ltr;
+}
+.pred-label {
+  font-family: 'Share Tech Mono'; font-size: 11px;
+  color: var(--cyan); letter-spacing: 3px;
+  margin-top: 5px; text-shadow: 0 0 5px var(--cyan);
+}
 
-.multiplier{position:relative;z-index:10;direction:ltr;font-family:'Orbitron',sans-serif;font-weight:900;font-size:40px;color:#fff;letter-spacing:1px;line-height:1;
-  text-shadow:0 0 15px rgba(255,255,255,.6),0 0 35px rgba(168,85,247,.9),0 0 60px rgba(217,70,239,.5);transition:opacity .3s,transform .3s,color .4s,text-shadow .4s;}
-.multiplier.error-text{color:#ef4444;font-size:34px;letter-spacing:6px;
-  text-shadow:0 0 15px rgba(239,68,68,.9),0 0 40px rgba(239,68,68,.8),0 0 70px rgba(220,38,38,.6);animation:errorPulse 1.2s ease-in-out infinite;}
+/* حالة الخطأ في الرادار */
+.radar-gauge.error-mode {
+  box-shadow: inset 0 0 40px rgba(239,68,68,.3), 0 0 30px rgba(239,68,68,.5);
+  background: radial-gradient(circle at center, #2a0b0b 0%, #0f0101 80%);
+}
+.radar-gauge.error-mode .gauge-arc-1 { border-color: #ef4444 #ef4444 #b91c1c; filter: drop-shadow(0 0 10px #ef4444); }
+.radar-gauge.error-mode .gauge-arc-2 { border-color: #ef4444 #ef4444 #b91c1c; filter: drop-shadow(0 0 10px #ef4444); }
+.radar-gauge.error-mode .laser-beam { background: linear-gradient(90deg, transparent, #ef4444, #fff, #ef4444, transparent); box-shadow: 0 0 20px #ef4444, 0 0 40px #ef4444; }
+.pred-value.error-text { color: #ef4444; font-size: 42px; letter-spacing: 6px; text-shadow: 0 0 15px rgba(239,68,68,.9), 0 0 40px rgba(239,68,68,.8); animation: errorPulse 1.2s ease-in-out infinite; }
 @keyframes errorPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.75;transform:scale(1.05)}}
 
-.circle-container.shaking{animation:circleShake .5s cubic-bezier(.36,.07,.19,.97) both}
-@keyframes circleShake{
-  0%,100%{transform:translate(0,0) rotate(0)}
-  10%{transform:translate(-4px,-2px) rotate(-1deg)}
-  20%{transform:translate(4px,2px) rotate(1deg)}
-  30%{transform:translate(-5px,3px) rotate(-1.5deg)}
-  40%{transform:translate(5px,-3px) rotate(1.5deg)}
-  50%{transform:translate(-4px,2px) rotate(-1deg)}
-  60%{transform:translate(4px,-2px) rotate(1deg)}
-  70%{transform:translate(-3px,1px) rotate(-.5deg)}
-  80%{transform:translate(3px,-1px) rotate(.5deg)}
-  90%{transform:translate(-2px,1px) rotate(0)}
-}
+.data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+.data-card { background: rgba(255,255,255,0.02); border: 1px solid #1a2a40; border-radius: 6px; padding: 15px; }
+.data-card .lbl { font-family: 'Share Tech Mono'; font-size: 10px; color: var(--muted); margin-bottom: 5px; }
+.data-card .val { font-family: 'Share Tech Mono'; font-size: 16px; color: #fff; }
+.data-card .val.cyan { color: var(--cyan); }
+.data-card .val.green { color: var(--success); }
 
-.hud-card{display:flex;align-items:center;gap:12px;direction:ltr;padding:14px 18px;margin-bottom:10px;border-radius:16px;
-  background:linear-gradient(110deg,rgba(28,14,55,.85),rgba(20,10,45,.85));border:1px solid var(--line);
-  box-shadow:inset 0 0 20px rgba(168,85,247,.06);position:relative;overflow:hidden;transition:.4s;}
-.hud-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--primary),var(--primary2));transition:.4s;}
-.hud-card.gold::before{background:linear-gradient(180deg,var(--gold),var(--gold2))}
+.timer-bar-wrap { background: rgba(255,255,255,0.02); border: 1px solid #1a2a40; border-radius: 6px; padding: 15px; text-align: center; transition: 0.4s; }
+.time-val { font-family: 'Orbitron'; font-size: 28px; color: var(--gold); font-weight: 900; margin-top: 5px; letter-spacing: 2px; transition: 0.4s; }
+.time-line { height: 3px; background: #1a2a40; margin-top: 10px; border-radius: 2px; overflow: hidden; }
+.time-line-fill { height: 100%; background: var(--gold); width: 100%; transition: width 1s linear, background 0.4s; }
 
-.hud-card.error-mode{border-color:rgba(239,68,68,.5);background:linear-gradient(110deg,rgba(60,15,25,.85),rgba(30,5,15,.85));box-shadow:inset 0 0 25px rgba(239,68,68,.12);}
-.hud-card.error-mode::before{background:linear-gradient(180deg,#ef4444,#b91c1c);}
-.hud-card.error-mode .hud-icon{color:#ef4444;border-color:rgba(239,68,68,.5);background:radial-gradient(circle,rgba(239,68,68,.25),rgba(40,5,15,.9));box-shadow:0 0 16px rgba(239,68,68,.35);}
-.hud-card.error-mode .v1{color:#ef4444!important;text-shadow:0 0 10px rgba(239,68,68,.7)!important;animation:errorPulse 1.2s ease-in-out infinite;}
-
-.hud-icon{width:46px;height:46px;border-radius:12px;flex-shrink:0;background:radial-gradient(circle,rgba(168,85,247,.25),rgba(20,10,45,.9));
-  border:1px solid rgba(168,85,247,.4);display:flex;align-items:center;justify-content:center;color:var(--primary);overflow:hidden;transition:.4s;}
-.hud-card.gold .hud-icon{color:var(--gold);border-color:rgba(251,191,36,.4);background:radial-gradient(circle,rgba(251,191,36,.2),rgba(30,20,5,.9));box-shadow:0 0 16px rgba(251,191,36,.25);}
-.hud-icon svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.hud-icon .brand-img{width:100%;height:100%;object-fit:cover;display:block;border-radius:11px;}
-.hud-body{flex:1;min-width:0;text-align:left}
-.hud-body .v1{font-family:'Share Tech Mono',monospace;font-size:17px;color:var(--gold);font-weight:700;letter-spacing:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  text-shadow:0 0 10px rgba(251,191,36,.5);transition:.4s;}
-.hud-body .v2{font-size:11px;color:var(--muted);letter-spacing:2px;margin-top:3px;text-transform:uppercase;font-weight:700;}
-.hud-body .v1.green{color:var(--success);text-shadow:0 0 10px rgba(34,197,94,.5)}
-.live-tag{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;color:var(--success);letter-spacing:1.5px;}
-.live-tag::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--success);box-shadow:0 0 8px var(--success);animation:blink 1.5s infinite;}
-.hud-card.error-mode .live-tag{color:#ef4444}
-.hud-card.error-mode .live-tag::before{background:#ef4444;box-shadow:0 0 8px #ef4444}
-
-.timer-panel{border-radius:20px;padding:18px 20px 20px;margin-bottom:12px;background:linear-gradient(135deg,rgba(45,22,80,.9),rgba(20,10,45,.9));
-  border:1px solid var(--line);position:relative;overflow:hidden;transition:.4s;}
-.timer-panel::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(251,191,36,.08),transparent 60%);pointer-events:none;}
-.timer-panel.error-mode{border-color:rgba(239,68,68,.5);background:linear-gradient(135deg,rgba(60,15,25,.9),rgba(30,5,15,.9));}
-.timer-panel.error-mode::before{background:radial-gradient(circle at 50% 0%,rgba(239,68,68,.12),transparent 60%);}
-.timer-panel.error-mode .tp-title{color:#fca5a5}
-.timer-panel.error-mode .tp-time{color:#ef4444;text-shadow:0 0 16px rgba(239,68,68,.9);animation:errorPulse 1.2s ease-in-out infinite;}
-.timer-panel.error-mode .tp-bar{border-color:rgba(239,68,68,.3)}
-.timer-panel.error-mode .tp-fill{background:linear-gradient(90deg,#b91c1c,#ef4444,#b91c1c);box-shadow:0 0 12px rgba(239,68,68,.9);}
-.timer-panel .tp-title{font-size:13px;font-weight:700;color:#d8c8f0;text-align:center;margin-bottom:10px;letter-spacing:1px;transition:.4s;}
-.timer-panel .tp-title::before{content:'⏱ '}
-.timer-panel .tp-time{direction:ltr;text-align:center;font-family:'Orbitron',sans-serif;font-weight:900;font-size:32px;color:var(--gold);letter-spacing:4px;text-shadow:0 0 16px rgba(251,191,36,.7);transition:.4s;}
-.tp-bar{height:6px;width:100%;margin-top:14px;border-radius:20px;background:rgba(10,5,22,.9);border:1px solid rgba(251,191,36,.2);overflow:hidden;}
-.tp-fill{height:100%;width:99%;border-radius:20px;background:linear-gradient(90deg,var(--primary),var(--primary2),var(--gold));background-size:200% 100%;box-shadow:0 0 12px rgba(251,191,36,.8);animation:barShine 2s linear infinite;transition:width 1s linear,background .4s;}
-@keyframes barShine{0%{background-position:0 0}100%{background-position:200% 0}}
+/* حالة الخطأ في البطاقات */
+.error-mode-border { border-color: rgba(239,68,68,.5) !important; background: linear-gradient(110deg,rgba(60,15,25,.85),rgba(30,5,15,.85)) !important; box-shadow: inset 0 0 25px rgba(239,68,68,.12) !important; }
+.error-text-val { color: #ef4444 !important; text-shadow: 0 0 10px rgba(239,68,68,.7) !important; }
+.error-mode .time-val { color: #ef4444 !important; text-shadow: 0 0 16px rgba(239,68,68,.9); animation: errorPulse 1.2s ease-in-out infinite; }
+.error-mode .time-line-fill { background: linear-gradient(90deg,#b91c1c,#ef4444,#b91c1c) !important; box-shadow: 0 0 12px rgba(239,68,68,.9); }
 
 /* ===== مودال خطأ ===== */
 .server-error-modal{position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px;z-index:5000;animation:modalFadeIn .4s ease;}
@@ -339,23 +296,8 @@ a.link{color:var(--primary);text-decoration:none;font-weight:800;border-bottom:1
 .server-error-hint{font-size:12px;color:#fca5a5;line-height:1.6;margin-bottom:22px;font-family:'Share Tech Mono',monospace;letter-spacing:1px;}
 .server-error-btn{width:100%;padding:16px;background:linear-gradient(180deg,#ef4444,#b91c1c);border:none;border-radius:12px;color:#fff;font-size:18px;font-weight:900;cursor:pointer;letter-spacing:1px;box-shadow:0 4px 20px rgba(239,68,68,.5),inset 0 -2px 6px rgba(0,0,0,.15);}
 
-/* Toast */
-#toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(90px);background:linear-gradient(135deg,#ef4444,#b91c1c);color:#fff;padding:12px 24px;border-radius:12px;font-size:13px;font-weight:800;
-  opacity:0;transition:.3s;z-index:2000;pointer-events:none;box-shadow:0 10px 30px rgba(239,68,68,.5);font-family:'Cairo',sans-serif;letter-spacing:1px;}
-#toast.show{transform:translateX(-50%) translateY(0);opacity:1}
-
-/* تيليجرام بوب */
-#telegramPopup{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-160%);width:calc(100% - 24px);max-width:460px;
-  background:linear-gradient(160deg,rgba(30,14,60,.98),rgba(12,5,28,.98));border:1.5px solid var(--primary);border-radius:16px;padding:12px;display:flex;align-items:center;gap:10px;
-  z-index:9997;transition:transform .5s cubic-bezier(.34,1.56,.64,1);direction:rtl;text-decoration:none;color:inherit;box-shadow:0 10px 40px rgba(168,85,247,.4);}
-#telegramPopup.show{transform:translateX(-50%) translateY(0)}
-.tg-close{width:34px;height:34px;border-radius:50%;background:rgba(20,8,40,.9);border:1px solid var(--line);color:var(--muted);display:flex;justify-content:center;align-items:center;font-size:18px;cursor:pointer;flex-shrink:0;}
-.tg-content{flex:1;text-align:right}
-.tg-title{font-size:14px;font-weight:900;color:#fff;margin-bottom:4px;display:flex;align-items:center;gap:6px;}
-.tg-title span{color:var(--gold)}
-.tg-desc{font-size:11px;color:var(--muted);line-height:1.6}
-.tg-icon-btn{width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#29b6f6,#0288d1);display:flex;justify-content:center;align-items:center;flex-shrink:0;box-shadow:0 0 20px rgba(41,182,246,.7);}
-.tg-icon-btn svg{width:28px;height:28px;fill:#fff;margin-right:-3px}
+#toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #000; border: 1px solid var(--cyan); color: #fff; padding: 10px 20px; border-radius: 4px; font-size: 13px; opacity: 0; transition: 0.3s; z-index: 2000; }
+#toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 </style>
 </head>
 <body oncontextmenu="return false" onselectstart="return false" ondragstart="return false">
@@ -374,258 +316,164 @@ a.link{color:var(--primary);text-decoration:none;font-weight:800;border-bottom:1
   </div>
 </div>
 
-<a id="telegramPopup" href="https://t.me/betrScripts" target="_blank" rel="noopener">
-  <div class="tg-close" id="tgClose">✕</div>
-  <div class="tg-content">
-    <div class="tg-title"><span>◆</span> تحديثات NEXUS v19.0</div>
-    <div class="tg-desc">انضم لقناة تليجرام لأحدث التوقعات والتحديثات الحصرية!</div>
-  </div>
-  <div class="tg-icon-btn">
-    <svg viewBox="0 0 24 24"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>
-  </div>
-</a>
-
-<canvas id="matrixCanvas"></canvas>
-<div class="bg-grid"></div>
-<div class="bg-glow"></div>
+<canvas id="networkCanvas"></canvas>
 
 <div class="app">
 
-  <!-- شاشة التحميل -->
   <div id="loadingScreen">
-    <div class="hex-wrap">
-      <div class="hex-ring h1"></div>
-      <div class="hex-ring h2"></div>
-      <div class="hex-ring h3"></div>
-      <div class="hex-core"></div>
-      <div class="hex-pct">
-        <span id="loaderPct">0%</span>
-        <small>LOADING</small>
-      </div>
+    <div class="load-grid-bg"></div>
+    <div class="text-loader-container">
+      <h1 class="text-loader" id="loadText">TAURUS</h1>
+      <div class="load-percent" id="loadPctText">0%</div>
+      <div class="version-glitch" data-text="v20.0">v20.0</div>
     </div>
-    <div class="brand-line">TAURUS</div>
-    <div class="brand-sub">NEXUS <b>v19.0</b></div>
-    <div class="load-track">
-      <div class="load-blocks" id="loadBlocks">
-        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-        <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-        <i></i><i></i><i></i>
-      </div>
-    </div>
-    <div class="load-status" id="loaderStatus">BOOTING SYSTEM</div>
   </div>
 
-  <!-- تسجيل الدخول -->
   <div id="loginScreen" style="display:none;">
-    <div class="screen-head">
-      <div class="kicker">SECURE ACCESS</div>
-      <h2>تسجيل الدخول</h2>
-      <p>أدخل بياناتك للمتابعة إلى النظام</p>
+    <div class="title" style="margin-top: 20px;">
+      <h2>SYSTEM ACCESS</h2>
+      <p>بوابة الدخول الموحدة للتحقق</p>
     </div>
-
-    <div class="glass">
-      <div class="field">
-        <label class="lbl">ACCOUNT ID · 10 DIGITS</label>
-        <div class="input-wrap">
-          <div class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg></div>
-          <input type="tel" id="loginId" class="inp digits" placeholder="XXXXXXXXXX" maxlength="10" inputmode="numeric" autocomplete="off">
-        </div>
-        <div class="err-msg" id="idError">⚠ يجب أن يكون ID مكوّن من 10 أرقام</div>
+    <div class="hud-panel">
+      <div class="input-group">
+        <label>ACCOUNT ID</label>
+        <input type="tel" id="loginId" class="digits" placeholder="أدخل ID" maxlength="10" inputmode="numeric">
+        <div class="err-msg" id="idError">⚠ أدخل ID صحيح</div>
       </div>
-
-      <div class="field" style="margin-bottom:6px;">
-        <label class="lbl">PASSWORD</label>
-        <div class="input-wrap">
-          <div class="ic"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3"/></svg></div>
-          <input type="text" id="loginPass" class="inp pass" placeholder="••••••••••" autocomplete="off">
-        </div>
-        <div class="err-msg" id="passError">⚠ من فضلك أدخل كلمة المرور</div>
+      <div class="input-group" style="margin-bottom:0;">
+        <label>PASSWORD</label>
+        <input type="text" id="loginPass" placeholder="••••••••" style="direction:ltr;text-align:center;">
+        <div class="err-msg" id="passError">⚠ أدخل كلمة المرور</div>
       </div>
     </div>
+    <button class="btn btn-primary" id="loginBtn">تسجيل الدخول</button>
 
-    <button class="btn-main" id="loginBtn">
-      <span><span class="arw">»</span> دخول النظام <span class="arw">«</span></span>
-    </button>
-
-    <div class="alert warn" style="margin-top:18px;">مهم جداً قبل استخدام السكربت</div>
+    <div class="alert warn">تنبيه هام جداً قبل الاستخدام</div>
     <div class="alert info">
-      لضمان تشغيل السكربت، قم بإنشاء حساب جديد على منصة <b style="color:var(--gold)">1xBet</b> باستخدام البروموكود التالي:
-      <div class="promo">BX124</div>
-      ثم قم بعمل إيداع <b style="color:var(--gold)">300 جنيه</b> لضمان تشغيل السكربت بنسبة 100%
+      لضمان تشغيل السكربت بنسبة 100%، يجب إنشاء حساب جديد على منصة <b>1xBet</b> باستخدام البروموكود:
+      <div class="promo-box">Pemo1x</div>
+      ثم إيداع مبلغ <b>300 جنيه</b> كحد أدنى.
     </div>
-
-    <button class="btn-ghost gold" id="termsBtn">تنفيذ الشروط والتحقق</button>
+    <button class="btn btn-outline" id="termsBtn">تنفيذ الشروط واستخراج الكود</button>
   </div>
 
-  <!-- الشروط -->
+  <div id="errorLoginScreen" style="display:none;">
+    <div class="hud-panel" style="text-align:center; border-color:var(--magenta);">
+      <h2 style="color:var(--magenta); font-family:'Orbitron'; margin-bottom:15px;">ACCESS DENIED</h2>
+      <p style="color:#ffb3c6; font-size:14px; line-height:1.8;">البيانات التي أدخلتها غير صحيحة.<br>يرجى تنفيذ الشروط والتحقق أولاً للحصول على كود الدخول.</p>
+    </div>
+    <button class="btn btn-danger" id="exitBtn">رجوع للتحقق</button>
+  </div>
+
   <div id="termsScreen" style="display:none;">
-    <div class="screen-head">
-      <div class="kicker">VERIFICATION STEPS</div>
-      <h2>الشروط والتحقق</h2>
-      <p>أكمل الخطوات للحصول على الكود المجاني</p>
+    <div class="title" style="margin-top: 20px;">
+      <h2>VERIFICATION STEPS</h2>
+      <p>أكمل الخطوات للحصول على كود التفعيل</p>
     </div>
-
-    <div id="termsLoading" style="text-align:center;padding:40px 0;">
-      <div style="width:48px;height:48px;border:3px solid rgba(168,85,247,.2);border-top-color:var(--primary);border-radius:50%;margin:0 auto 16px;animation:spin .9s linear infinite;"></div>
-      <div style="color:var(--primary);font-size:12px;font-family:'Share Tech Mono',monospace;letter-spacing:3px;">LOADING TERMS</div>
+    <div id="termsLoading" style="text-align:center;padding:50px 0;">
+      <div style="width:40px; height:40px; border:3px solid #222; border-top-color:var(--cyan); border-radius:4px; margin:0 auto; animation:spin 1s linear infinite;"></div>
+      <style>@keyframes spin{100%{transform:rotate(360deg)}}</style>
     </div>
-
     <div id="termsContent" style="display:none;">
-      <div class="alert warn">لن يتم إعطاء الكود إلا بعد تنفيذ الخطوات والتحقق منها</div>
-
-      <div class="timeline">
-        <div class="tl-item">
-          <div class="dot">1</div>
-          <div class="box">حمّل منصة <b>1xBet</b> الرسمية<br><a href="https://eg-1xbet.com/ar/download/apk" target="_blank" class="link">اضغط هنا للتحميل</a></div>
-        </div>
-        <div class="tl-item">
-          <div class="dot">2</div>
-          <div class="box">أنشئ حساباً جديداً باستخدام البروموكود <b>(BX124)</b><br>ثم قم بإيداع <span class="hl">300ج</span> أو <span class="hl">6$</span> كحد أدنى</div>
-        </div>
-        <div class="tl-item">
-          <div class="dot">3</div>
-          <div class="box">أدخل رقم الحساب (ID) وارفع الأسكرينات المطلوبة</div>
-        </div>
-        <div class="tl-item">
-          <div class="dot">4</div>
-          <div class="box">اضغط <b>بدء التحقق</b> لتحصل على الكود المجاني</div>
-        </div>
+      <div class="hud-panel" style="padding:20px;">
+        <div class="step-box"><div class="step-num">1</div><div class="step-text">قم بتحميل تطبيق <b>1xBet</b> الرسمي من <a href="https://eg-1xbet.com/ar/download/apk" target="_blank">هنا</a>.</div></div>
+        <div class="step-box"><div class="step-num">2</div><div class="step-text">أنشئ حساباً جديداً باستخدام البروموكود <b>(Pemo1x)</b> وأودع <b>300ج</b> كحد أدنى.</div></div>
+        <div class="step-box"><div class="step-num">3</div><div class="step-text">أدخل رقم حسابك (ID) وارفع السكرينات المطلوبة.</div></div>
+        <div class="step-box" style="margin-bottom:0;"><div class="step-num">4</div><div class="step-text">اضغط <b>بدء التحقق</b> ليقوم النظام باستخراج الكود الخاص بك.</div></div>
       </div>
-
-      <div class="glass">
-        <div class="field">
-          <label class="lbl">ACCOUNT ID · 10 DIGITS</label>
-          <div class="input-wrap">
-            <div class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg></div>
-            <input type="tel" id="accountId" class="inp digits" placeholder="XXXXXXXXXX" maxlength="10" inputmode="numeric" autocomplete="off">
-          </div>
-          <div class="err-msg" id="accError">⚠ يجب أن يكون ID مكوّن من 10 أرقام</div>
+      <div class="hud-panel">
+        <div class="input-group">
+          <label>ACCOUNT ID</label>
+          <input type="tel" id="accountId" class="digits" placeholder="أدخل ID" maxlength="10" inputmode="numeric">
+          <div class="err-msg" id="accError">⚠ أدخل ID صحيح</div>
         </div>
-
-        <div class="uploads">
-          <label class="up-box" id="depBox">
-            <span class="up-ic">📷</span>
-            <span class="up-txt">اسكرين الإيداع</span>
+        <div class="upload-row">
+          <label class="upload-box" id="depBox">
             <input type="file" id="screenDeposit" accept="image/*">
-            <div class="up-name" id="depositName"></div>
+            <span id="depTxt">📸 سكرين الإيداع</span>
           </label>
-          <label class="up-box" id="proBox">
-            <span class="up-ic">📷</span>
-            <span class="up-txt">اسكرين البروموكود</span>
+          <label class="upload-box" id="proBox">
             <input type="file" id="screenPromo" accept="image/*">
-            <div class="up-name" id="promoName"></div>
+            <span id="proTxt">📸 سكرين البروموكود</span>
           </label>
         </div>
-        <div class="err-msg" id="uploadError">⚠ من فضلك ارفع الصورتين</div>
+        <div class="err-msg" id="uploadError">⚠ يجب رفع السكرينات</div>
       </div>
-
-      <button class="btn-main" id="verifyBtn">
-        <span><span class="arw">»</span> بدء التحقق <span class="arw">«</span></span>
-      </button>
+      <button class="btn btn-primary" id="verifyBtn">بدء التحقق واستخراج الكود</button>
     </div>
   </div>
 
-  <!-- التحقق -->
   <div id="verifyScreen" style="display:none;">
-    <div class="terminal" id="verifyBox">
-      <div class="term-bar">
-        <span>SECURE::1XBET</span>
+    <div class="terminal" id="verifyBox" style="margin-top: 20px;">
+      <div class="term-head">
+        <span>SECURE_SHELL::1XBET</span>
         <span class="live"><i></i>LIVE</span>
       </div>
-      <div class="term-title">VERIFYING ACCOUNT</div>
-      <div class="prog-meta">
-        <span id="vhProgressText">[ 0% ]</span>
-        <span id="vhStepText">STEP 1/7</span>
-      </div>
-      <div class="prog-segs" id="vhSegs">
+      <div class="term-body" id="termTitle">&gt; CONNECTING TO SERVER...</div>
+      <div class="term-bars" id="termBar">
         <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
       </div>
-      <div class="status-line" id="vhStatus">initializing secure connection</div>
-      <div class="log-box" id="vhLog"></div>
+      <div class="term-status" id="termStatus" style="color:#fff; font-size:12px; margin-bottom:10px;">Initializing handshake...</div>
+      <div class="term-log" id="termLog"></div>
     </div>
-
     <div id="codeBox" style="display:none;">
       <div class="code-card">
-        <div class="code-kicker">◆ CODE UNLOCKED ◆</div>
-        <div class="code-v" id="codeDisplay">------</div>
-        <div class="timer-ring-wrap">⏱ صلاحية الكود: <b id="timerDisplay">05:00</b></div>
+        <div style="font-size:12px; font-weight:bold; color:var(--gold); letter-spacing:2px; margin-bottom:10px;">◆ VIP ACCESS CODE ◆</div>
+        <div class="code-val" id="codeDisplay">------</div>
+        <div class="code-timer">صلاحية الكود: <b id="timerDisplay" style="color:var(--gold); font-family:'Orbitron';">05:00</b></div>
       </div>
-      <button class="btn-ghost" id="quickLoginBtn">تسجيل دخول سريعة</button>
+      <button class="btn btn-outline" id="quickLoginBtn">تسجيل دخول سريعة</button>
     </div>
   </div>
 
-  <!-- الترحيب -->
   <div id="welcomeScreen" style="display:none;">
-    <div class="welcome">
-      <div class="ok-circle">
+    <div class="welcome-box">
+      <div class="vault-icon">
         <svg viewBox="0 0 50 50"><path d="M14 26 L22 34 L37 18"/></svg>
       </div>
-      <h3>ACCESS GRANTED</h3>
-      <p id="welcomeSub">جاري تهيئة النظام</p>
+      <h2 style="font-family:'Orbitron'; color:var(--success); margin-bottom:10px; text-shadow: 0 0 20px var(--success);">ID DISCOVERED</h2>
+      <p id="welcomeSub" style="color:var(--muted); font-family:'Share Tech Mono'; font-size:14px;">Account: ...</p>
     </div>
-    <button class="btn-main" id="continueBtn">
-      <span><span class="arw">»</span> متابعة إلى اللوحة <span class="arw">«</span></span>
-    </button>
+    <button class="btn btn-primary" id="continueBtn">فتح لوحة التحكم</button>
   </div>
 
-  <!-- النتائج -->
   <div id="resultScreen" style="display:none;">
     <div class="hud-top">
-      <div class="lang-pill"><span class="flag">🇲🇦</span><span>العربية</span></div>
-      <a class="tg-btn" href="https://t.me/betrScripts" target="_blank" rel="noopener" aria-label="Telegram">
-        <svg viewBox="0 0 24 24"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>
-      </a>
-      <div class="hud-clock">
-        <span class="d1" id="headerDate">2026/09/15</span>
-        <span> · </span>
-        <span class="d2" id="headerDay">الإثنين</span>
-        <span> | </span>
-        <span class="d3" id="headerClock">16:00:00</span>
+      <div class="hud-brand">NEXUS <span>v20.0 PRO</span></div>
+      <div class="hud-status"><i></i> SYSTEM ONLINE</div>
+    </div>
+
+    <div class="pred-wrapper">
+      <div class="radar-gauge" id="techBox">
+        <div class="gauge-grid"></div>
+        <div class="gauge-arc-1"></div>
+        <div class="gauge-arc-2"></div>
+        <div class="laser-beam"></div>
+        <div class="gauge-content">
+          <div class="pred-value" id="livePrediction">0.00</div>
+          <div class="pred-label">LIVE PREDICTION</div>
+        </div>
       </div>
     </div>
 
-    <div class="hud-panel">
-      <section class="orb-area">
-        <div class="circle-container" id="circleContainer">
-          <div class="orb-ring r1"></div>
-          <div class="orb-ring r2"></div>
-          <div class="orb-ring r3"></div>
-          <div class="radar"></div>
-          <div class="cross-h"></div>
-          <div class="cross-v"></div>
-          <div class="particle-ring pr-1" id="pr1"></div>
-          <div class="particle-ring pr-2" id="pr2"></div>
-          <div class="particle-ring pr-3" id="pr3"></div>
-          <div class="multiplier" id="livePrediction">1.00x</div>
-        </div>
-      </section>
-
-      <div class="hud-card" id="idCard">
-        <div class="hud-icon">
-          <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg>
-        </div>
-        <div class="hud-body">
-          <div class="v1" id="resultId">------------</div>
-          <div class="v2">Account ID</div>
+    <div class="data-grid">
+      <div class="data-card" id="idCard">
+        <div class="lbl">ACCOUNT ID</div>
+        <div class="val cyan" id="resultId">----------</div>
+      </div>
+      <div class="data-card" id="brandCard" style="display:flex; align-items:center; gap:10px;">
+        <img src="https://raw.githubusercontent.com/turbo1-2/my-images/refs/heads/main/Screenshot_%D9%A2%D9%A0%D9%A2%D9%A6%D9%A0%D9%A9%D9%A1%D9%A4-%D9%A1%D9%A6%D9%A2%D9%A8%D9%A1%D9%A9_Telegram.jpg" style="width:30px;height:30px;border-radius:5px;object-fit:cover;" onerror="this.style.display='none'">
+        <div>
+          <div class="lbl" style="color:#fff;">1xBet</div>
+          <div class="val green" id="brandStatus" style="font-size:12px;">● ACTIVE</div>
         </div>
       </div>
+    </div>
 
-      <div class="hud-card gold" id="brandCard">
-        <div class="hud-icon">
-          <img id="platformLogo" class="brand-img" src="https://raw.githubusercontent.com/turbo1-2/my-images/refs/heads/main/Screenshot_%D9%A2%D9%A0%D9%A2%D9%A6%D9%A0%D9%A9%D9%A1%D9%A4-%D9%A1%D9%A6%D9%A2%D9%A8%D9%A1%D9%A9_Telegram.jpg" alt="1XBET"
-            onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\'color:var(--gold);font-size:9px;font-weight:800;text-align:center;line-height:1.1;\'>1XBET</span>';">
-        </div>
-        <div class="hud-body">
-          <div class="v1 green" id="brandName">1xBet</div>
-          <div class="v2"><span class="live-tag" id="brandStatus">ACTIVE</span></div>
-        </div>
-      </div>
-
-      <div class="timer-panel" id="timerPanel">
-        <div class="tp-title">الوقت المتبقي من الكود</div>
-        <div class="tp-time" id="mainTimerDisplay">00:59:56</div>
-        <div class="tp-bar"><div class="tp-fill" id="mainTimerBar" style="width:99%"></div></div>
-      </div>
+    <div class="timer-bar-wrap" id="timerPanel">
+      <div style="font-size:12px; color:var(--muted);">الوقت المتبقي لصلاحية الكود</div>
+      <div class="time-val" id="mainTimerDisplay">00:59:56</div>
+      <div class="time-line"><div class="time-line-fill" id="mainTimerFill"></div></div>
     </div>
   </div>
 
@@ -633,8 +481,8 @@ a.link{color:var(--primary);text-decoration:none;font-weight:800;border-bottom:1
 
 <div id="toast"></div>
 
-<!-- ══════════ الحماية ══════════ -->
 <script>
+// ====== الحماية ======
 document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
 document.addEventListener('keydown', function(e){
   if (e.keyCode === 123) { e.preventDefault(); return false; }
@@ -649,368 +497,249 @@ document.addEventListener('keydown', function(e){
 });
 document.onselectstart = function(){ return false; };
 document.ondragstart = function(){ return false; };
-</script>
 
-<!-- ══════════ الكود الرئيسي ══════════ -->
-<script>
-var $ = function(id){ return document.getElementById(id); };
+// ====== خلفية الجزيئات ======
+const canvas = document.getElementById('networkCanvas');
+const ctx = canvas.getContext('2d');
+let width, height, particles;
 
-function showToast(msg){
-  var t = $('toast');
-  if (!t) return;
-  t.textContent = msg;
-  t.className = 'show';
-  clearTimeout(t._tm);
-  t._tm = setTimeout(function(){ t.className = ''; }, 2400);
-}
-
-function showScreen(id){
-  var arr = ['loadingScreen','loginScreen','termsScreen','verifyScreen','welcomeScreen','resultScreen'];
-  for (var i = 0; i < arr.length; i++) {
-    var el = $(arr[i]);
-    if (el) el.style.display = (arr[i] === id) ? 'block' : 'none';
+function initCanvas() {
+  width = canvas.width = window.innerWidth;
+  height = canvas.height = window.innerHeight;
+  particles = [];
+  for (let i = 0; i < 60; i++) {
+    particles.push({
+      x: Math.random() * width, y: Math.random() * height,
+      vx: (Math.random() - 0.5) * 0.4, vy: (Math.random() - 0.5) * 0.4,
+      r: Math.random() * 2 + 0.5,
+      color: Math.random() > 0.5 ? '0, 243, 255' : '255, 0, 85'
+    });
   }
+}
+function drawParticles() {
+  ctx.clearRect(0, 0, width, height);
+  for (let i = 0; i < particles.length; i++) {
+    let p = particles[i];
+    p.x += p.vx; p.y += p.vy;
+    if (p.x < 0 || p.x > width)  p.vx *= -1;
+    if (p.y < 0 || p.y > height) p.vy *= -1;
+    ctx.fillStyle = `rgba(${p.color}, 0.8)`;
+    ctx.shadowBlur = 10; ctx.shadowColor = `rgba(${p.color}, 1)`;
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+    ctx.shadowBlur = 0;
+    for (let j = i + 1; j < particles.length; j++) {
+      let p2 = particles[j];
+      let dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+      if (dist < 140) {
+        ctx.strokeStyle = `rgba(${p.color}, ${0.15 - dist/1500})`;
+        ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(drawParticles);
+}
+initCanvas(); drawParticles();
+window.addEventListener('resize', initCanvas);
+
+// ====== منطق التطبيق ======
+const $ = id => document.getElementById(id);
+
+function toast(msg) {
+  const t = $('toast'); t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+function showScreen(id) {
+  ['loadingScreen','loginScreen','errorLoginScreen','termsScreen','verifyScreen','welcomeScreen','resultScreen'].forEach(s => {
+    if ($(s)) {
+      if (s === 'loadingScreen') $(s).style.display = (s === id) ? 'flex' : 'none';
+      else $(s).style.display = (s === id) ? 'block' : 'none';
+    }
+  });
   window.scrollTo(0, 0);
 }
 
-/* Matrix */
-(function(){
-  var canvas = $('matrixCanvas');
-  if (!canvas) return;
-  var ctx = canvas.getContext('2d');
-  var w, h, cols, drops = [];
-  function resize(){
-    w = canvas.width = window.innerWidth;
-    h = canvas.height = window.innerHeight;
-    cols = Math.floor(w / 16);
-    drops = [];
-    for (var i = 0; i < cols; i++) drops[i] = Math.random() * h;
+// ====== التحميل السلس جداً (تم حل مشكلة التعليق نهائياً) ======
+const loadText = $('loadText');
+const loadPctText = $('loadPctText');
+const LOAD_DURATION = 2500; // 2.5 ثانية
+let loadStartTime = null;
+
+function animateLoading(timestamp) {
+  if (!loadStartTime) loadStartTime = timestamp;
+  const elapsed = timestamp - loadStartTime;
+  let pct = Math.min((elapsed / LOAD_DURATION) * 100, 100);
+  
+  loadPctText.textContent = Math.floor(pct) + '%';
+  loadText.style.background = `linear-gradient(90deg, #fff ${pct}%, rgba(255,255,255,0.1) ${pct}%)`;
+  loadText.style.webkitBackgroundClip = 'text';
+  loadText.style.backgroundClip = 'text';
+
+  if (pct < 100) {
+    requestAnimationFrame(animateLoading);
+  } else {
+    setTimeout(() => {
+      $('loadingScreen').classList.add('hidden');
+      setTimeout(() => showScreen('loginScreen'), 600);
+    }, 300);
   }
-  resize();
-  window.addEventListener('resize', resize);
-  var chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
-  function draw(){
-    ctx.fillStyle = 'rgba(7,3,15,0.08)';
-    ctx.fillRect(0, 0, w, h);
-    ctx.font = '14px monospace';
-    for (var i = 0; i < drops.length; i++){
-      var text = chars[Math.floor(Math.random() * chars.length)];
-      ctx.fillStyle = 'rgba(168,85,247,0.35)';
-      ctx.fillText(text, i * 16, drops[i]);
-      if (drops[i] > h && Math.random() > 0.975) drops[i] = 0;
-      drops[i] += 14 + Math.random() * 6;
-    }
-  }
-  setInterval(draw, 55);
-})();
-
-/* شاشة التحميل */
-var pct = 0;
-var statuses = ['BOOTING SYSTEM', 'LOADING MODULES', 'CONNECTING SERVER', 'SYSTEM READY'];
-var statusIdx = 0;
-var blocks = $('loadBlocks').children;
-var totalBlocks = blocks.length;
-
-var pctInterval = setInterval(function(){
-  pct += Math.floor(Math.random() * 5) + 2;
-  if (pct >= 100) { pct = 100; clearInterval(pctInterval); }
-  $('loaderPct').textContent = pct + '%';
-  var onCount = Math.floor((pct / 100) * totalBlocks);
-  for (var i = 0; i < totalBlocks; i++) {
-    if (i < onCount) blocks[i].classList.add('on');
-    else blocks[i].classList.remove('on');
-  }
-  var newIdx = Math.min(Math.floor(pct / 26), 3);
-  if (newIdx !== statusIdx) {
-    statusIdx = newIdx;
-    $('loaderStatus').textContent = statuses[statusIdx];
-  }
-}, 100);
-
-window.addEventListener('load', function(){
-  setTimeout(function(){ showScreen('loginScreen'); }, 3000);
-  setTimeout(function(){
-    var tg = $('telegramPopup');
-    if (tg) tg.classList.add('show');
-  }, 5000);
-});
-
-$('tgClose').addEventListener('click', function(e){
-  e.preventDefault(); e.stopPropagation();
-  $('telegramPopup').classList.remove('show');
-});
-
-/* State */
-var currentId = '';
-var countdownInterval = null;
-var hasCode = false;
-var mainTimerInterval = null;
-var mainTimerSeconds = 3596;
-
-function startMainTimer(){
-  clearInterval(mainTimerInterval);
-  mainTimerSeconds = 3596;
-  updateMainTimer();
-  mainTimerInterval = setInterval(function(){
-    mainTimerSeconds--;
-    if (mainTimerSeconds < 0) mainTimerSeconds = 3600;
-    updateMainTimer();
-  }, 1000);
 }
-function updateMainTimer(){
-  var h = String(Math.floor(mainTimerSeconds / 3600)).padStart(2,'0');
-  var m = String(Math.floor((mainTimerSeconds % 3600) / 60)).padStart(2,'0');
-  var s = String(mainTimerSeconds % 60).padStart(2,'0');
-  var el = $('mainTimerDisplay');
-  var bar = $('mainTimerBar');
-  if (el) el.textContent = h + ':' + m + ':' + s;
-  if (bar) bar.style.width = (mainTimerSeconds / 3600 * 100).toFixed(1) + '%';
-}
+requestAnimationFrame(animateLoading);
 
-['loginId','accountId'].forEach(function(id){
-  var el = $(id);
-  if (el) el.addEventListener('input', function(e){
-    e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10);
-  });
-});
-
-/* الشروط */
-$('termsBtn').addEventListener('click', function(){
+// ====== التنقل ======
+$('termsBtn').addEventListener('click', () => {
   showScreen('termsScreen');
-  $('termsLoading').style.display = 'block';
-  $('termsContent').style.display = 'none';
-  setTimeout(function(){
+  setTimeout(() => {
     $('termsLoading').style.display = 'none';
     $('termsContent').style.display = 'block';
-  }, 1400);
+  }, 1000);
 });
+$('exitBtn').addEventListener('click', () => $('termsBtn').click());
 
-/* الدخول */
-$('loginBtn').addEventListener('click', function(){
-  var id = $('loginId').value.trim();
-  var pass = $('loginPass').value.trim();
-  var ok = true;
-  if (!id || id.length !== 10) {
-    $('loginId').classList.add('error');
-    $('idError').classList.add('show');
-    ok = false;
-  } else {
-    $('loginId').classList.remove('error');
-    $('idError').classList.remove('show');
-  }
-  if (!pass) {
-    $('loginPass').classList.add('error');
-    $('passError').classList.add('show');
-    ok = false;
-  } else {
-    $('loginPass').classList.remove('error');
-    $('passError').classList.remove('show');
-  }
-  if (!ok) return;
-  if (!hasCode) {
-    showToast('يجب تنفيذ الشروط أولاً');
-    setTimeout(function(){
-      showScreen('termsScreen');
-      $('termsLoading').style.display = 'block';
-      $('termsContent').style.display = 'none';
-      setTimeout(function(){
-        $('termsLoading').style.display = 'none';
-        $('termsContent').style.display = 'block';
-      }, 1400);
-    }, 1500);
-    return;
-  }
-  localStorage.setItem('savedId', id);
-  localStorage.setItem('savedPass', pass);
-  showWelcome(id);
-});
-
-/* رفع الصور */
-$('screenDeposit').addEventListener('change', function(e){
-  var f = e.target.files[0];
-  if (f) {
-    $('depositName').textContent = '✓ ' + f.name;
+// ====== رفع السكرينات ======
+$('screenDeposit').addEventListener('change', e => {
+  if (e.target.files[0]) {
+    $('depTxt').innerHTML = '✓ تم الرفع';
     $('depBox').classList.add('filled');
     $('uploadError').classList.remove('show');
   }
 });
-$('screenPromo').addEventListener('change', function(e){
-  var f = e.target.files[0];
-  if (f) {
-    $('promoName').textContent = '✓ ' + f.name;
+$('screenPromo').addEventListener('change', e => {
+  if (e.target.files[0]) {
+    $('proTxt').innerHTML = '✓ تم الرفع';
     $('proBox').classList.add('filled');
     $('uploadError').classList.remove('show');
   }
 });
 
-/* التحقق */
-var vhSteps = [
-  { pct: 15, status: 'initializing', log: 'connecting to 1xbet.node' },
-  { pct: 30, status: 'handshake', log: 'TLS 1.3 established' },
-  { pct: 48, status: 'querying', log: 'select * from accounts' },
-  { pct: 65, status: 'validating', log: 'checksum verified' },
-  { pct: 78, status: 'verifying', log: 'deposit >= 300 EGP OK' },
-  { pct: 92, status: 'verifying', log: 'promo "BX124" matched OK' },
-  { pct: 100, status: 'ACCESS GRANTED', log: 'session token issued' }
-];
+// ====== الحالة ======
+let hasCode = false, currentId = '', cdInt, mainTimerSec = 3596;
 
-$('verifyBtn').addEventListener('click', function(){
-  var id = $('accountId').value.trim();
-  var dep = $('screenDeposit').files[0];
-  var pro = $('screenPromo').files[0];
-  var ok = true;
-  if (!id || id.length !== 10) {
-    $('accountId').classList.add('error');
-    $('accError').classList.add('show');
-    ok = false;
-  }
-  if (!dep || !pro) {
-    $('uploadError').classList.add('show');
-    ok = false;
-  }
-  if (!ok) { showToast('أكمل البيانات المطلوبة'); return; }
+// ====== تسجيل الدخول ======
+$('loginBtn').addEventListener('click', () => {
+  const id = $('loginId').value.trim(), pass = $('loginPass').value.trim();
+  let ok = true;
+  if (id.length !== 10) { $('loginId').classList.add('error'); $('idError').classList.add('show'); ok = false; }
+  else { $('loginId').classList.remove('error'); $('idError').classList.remove('show'); }
+  
+  if (!pass) { $('loginPass').classList.add('error'); $('passError').classList.add('show'); ok = false; }
+  else { $('loginPass').classList.remove('error'); $('passError').classList.remove('show'); }
+  
+  if (!ok) return;
+  if (!hasCode) { showScreen('errorLoginScreen'); return; }
+  showWelcome(id);
+});
 
+// ====== التحقق ======
+$('verifyBtn').addEventListener('click', () => {
+  const id = $('accountId').value.trim();
+  if (id.length !== 10) { $('accountId').classList.add('error'); $('accError').classList.add('show'); toast('أدخل ID صحيح'); return; }
+  if (!$('screenDeposit').files[0] || !$('screenPromo').files[0]) { $('uploadError').classList.add('show'); return; }
+  
   currentId = id;
-  localStorage.setItem('lastId', id);
   showScreen('verifyScreen');
-  $('verifyBox').style.display = 'block';
-  $('codeBox').style.display = 'none';
+  $('verifyBox').style.display = 'block'; $('codeBox').style.display = 'none';
 
-  var segs = $('vhSegs').children;
-  for (var i = 0; i < segs.length; i++) segs[i].className = '';
-  $('vhLog').innerHTML = '';
+  const bars = $('termBar').children;
+  let step = 0;
+  const steps = [
+    { s: "Connecting to 1xbet API...",   l: "> node init" },
+    { s: "Authenticating...",             l: "> handshake success" },
+    { s: "Checking deposit amount...",    l: "> dep >= 300 EGP" },
+    { s: "Validating Promo Code...",      l: "> code: Pemo1x matched" },
+    { s: "ACCESS GRANTED",                l: "> session token issued" }
+  ];
 
-  var step = 0;
-  var addLog = function(text){
-    var div = document.createElement('div');
-    div.className = 'log-line';
-    var now = new Date();
-    var t = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0') + ':' + String(now.getSeconds()).padStart(2,'0');
-    div.innerHTML = '<b>[' + t + ']</b> <i>' + text + '</i>';
-    $('vhLog').appendChild(div);
-    while ($('vhLog').children.length > 4) $('vhLog').removeChild($('vhLog').firstChild);
-  };
-
-  addLog('user id: ' + id);
-  addLog('connecting...');
-
-  var runStep = function(){
-    if (step >= vhSteps.length) {
-      setTimeout(function(){
+  const run = () => {
+    if (step >= steps.length) {
+      setTimeout(() => {
         $('verifyBox').style.display = 'none';
-        var code = 'TRS' + Math.floor(1000 + Math.random() * 9000);
-        $('codeDisplay').textContent = code;
+        $('codeDisplay').textContent = 'TRS' + Math.floor(1000 + Math.random() * 9000);
         $('codeBox').style.display = 'block';
         hasCode = true;
-
-        var t = 300;
-        $('timerDisplay').textContent = '05:00';
-        clearInterval(countdownInterval);
-        countdownInterval = setInterval(function(){
+        let t = 300;
+        if (cdInt) clearInterval(cdInt);
+        cdInt = setInterval(() => {
           t--;
-          var m = String(Math.floor(t / 60)).padStart(2,'0');
-          var s = String(t % 60).padStart(2,'0');
-          $('timerDisplay').textContent = m + ':' + s;
-          if (t <= 0) clearInterval(countdownInterval);
+          $('timerDisplay').textContent = String(Math.floor(t / 60)).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0');
+          if (t <= 0) clearInterval(cdInt);
         }, 1000);
       }, 500);
       return;
     }
-    var st = vhSteps[step];
-    var segIndex = Math.min(step, segs.length - 1);
-    for (var i = 0; i <= segIndex; i++) {
-      segs[i].className = (i === segs.length - 1 && step === vhSteps.length - 1) ? 'gold' : 'on';
-    }
-    $('vhProgressText').textContent = '[ ' + st.pct + '% ]';
-    $('vhStatus').textContent = st.status;
-    $('vhStepText').textContent = 'STEP ' + (step + 1) + '/' + vhSteps.length;
-    addLog(st.log);
+    bars[step].classList.add('on');
+    $('termStatus').textContent = steps[step].s;
+    $('termLog').innerHTML += steps[step].l + '<br>';
     step++;
-    setTimeout(runStep, 700 + Math.random() * 500);
+    setTimeout(run, 800);
   };
-  runStep();
+  run();
 });
 
-$('quickLoginBtn').addEventListener('click', function(){
-  showWelcome(currentId || '0000000000');
-});
+// ====== تسجيل الدخول السريع ======
+$('quickLoginBtn').addEventListener('click', () => showWelcome(currentId));
 
-/* متابعة → النتائج */
-$('continueBtn').addEventListener('click', function(){
-  var id = localStorage.getItem('lastId') || localStorage.getItem('savedId') || currentId || '0000000000';
-  $('resultId').textContent = id;
+// ====== فتح لوحة التحكم وإظهار الخطأ ======
+$('continueBtn').addEventListener('click', () => {
+  $('resultId').textContent = currentId || '0000000000';
   showScreen('resultScreen');
-  setTimeout(createAllParticles, 300);
+
+  if (window.__mainTimerInt) clearInterval(window.__mainTimerInt);
+  window.__mainTimerInt = setInterval(() => {
+    mainTimerSec--;
+    if (mainTimerSec < 0) mainTimerSec = 3600;
+    const h = String(Math.floor(mainTimerSec / 3600)).padStart(2, '0');
+    const m = String(Math.floor((mainTimerSec % 3600) / 60)).padStart(2, '0');
+    const s = String(mainTimerSec % 60).padStart(2, '0');
+    $('mainTimerDisplay').textContent = `${h}:${m}:${s}`;
+    $('mainTimerFill').style.width = (mainTimerSec / 3600 * 100) + '%';
+  }, 1000);
+
+  // إظهار الخطأ بدلاً من التوقعات (مفصول عن Firebase)
   setTimeout(triggerErrorState, 900);
 });
 
-function showWelcome(id){
+function showWelcome(id) {
   showScreen('welcomeScreen');
-  setTimeout(function(){
-    $('welcomeSub').textContent = 'ACCOUNT: ' + id;
-  }, 300);
+  $('welcomeSub').textContent = 'ACCOUNT ID: ' + id;
 }
 
-/* النقط */
-function createAllParticles(){
-  createParticles("pr1", 55, 50);
-  createParticles("pr2", 70, 50);
-  createParticles("pr3", 90, 50);
-}
-function createParticles(id, count, radius){
-  var container = document.getElementById(id);
-  if (!container) return;
-  container.innerHTML = "";
-  var spread = 8;
-  for (var i = 0; i < count; i++) {
-    var dot = document.createElement("span");
-    var angle = (360 / count) * i + Math.random() * 5;
-    var radian = angle * Math.PI / 180;
-    var dist = radius - spread + Math.random() * spread;
-    var x = 50 + Math.cos(radian) * dist;
-    var y = 50 + Math.sin(radian) * dist;
-    dot.style.left = x + "%";
-    dot.style.top = y + "%";
-    if (i % 3 === 0) dot.classList.add("big");
-    else dot.classList.add("small");
-    dot.style.animationDelay = (Math.random() * 2.5).toFixed(2) + "s";
-    container.appendChild(dot);
-  }
-}
-
-/* ⭐ حالة الإيرور */
+// ====== حالة الإيرور ======
 function triggerErrorState(){
   var pred = $('livePrediction');
   if (pred) {
     pred.classList.add('error-text');
     pred.textContent = 'ERROR';
-    pred.style.opacity = '1';
-    pred.style.transform = 'scale(1)';
   }
-  var cc = $('circleContainer');
-  if (cc) cc.classList.add('error-mode');
+  var techBox = $('techBox');
+  if (techBox) techBox.classList.add('error-mode');
+  
   var idCard = $('idCard');
-  if (idCard) idCard.classList.add('error-mode');
+  if (idCard) idCard.classList.add('error-mode-border');
+  var resultId = $('resultId');
+  if (resultId) resultId.classList.add('error-text-val');
+
   var brandCard = $('brandCard');
-  if (brandCard) brandCard.classList.add('error-mode');
+  if (brandCard) brandCard.classList.add('error-mode-border');
   var brandStatus = $('brandStatus');
-  if (brandStatus) brandStatus.textContent = 'OFFLINE';
+  if (brandStatus) { brandStatus.textContent = '● OFFLINE'; brandStatus.classList.replace('green', 'error-text-val'); }
+  
   var timerPanel = $('timerPanel');
   if (timerPanel) timerPanel.classList.add('error-mode');
   var timerDisplay = $('mainTimerDisplay');
   if (timerDisplay) timerDisplay.textContent = '--:--:--';
-  var timerBar = $('mainTimerBar');
+  var timerBar = $('mainTimerFill');
   if (timerBar) timerBar.style.width = '100%';
 
-  setTimeout(function(){
+  setTimeout(() => {
     $('serverErrorModal').classList.add('show');
   }, 2000);
 }
 
-/* إغلاق المودال */
+// ====== إغلاق المودال ======
 function closeServerError(){
   $('serverErrorModal').classList.remove('show');
-  setTimeout(function(){
+  setTimeout(() => {
     resetErrorState();
     $('loginPass').value = '';
     showScreen('loginScreen');
@@ -1022,50 +751,32 @@ function resetErrorState(){
   var pred = $('livePrediction');
   if (pred) {
     pred.classList.remove('error-text');
-    pred.textContent = '1.00x';
-    pred.style.opacity = '1';
-    pred.style.transform = 'scale(1)';
+    pred.textContent = '0.00';
   }
-  var cc = $('circleContainer');
-  if (cc) cc.classList.remove('error-mode');
+  var techBox = $('techBox');
+  if (techBox) techBox.classList.remove('error-mode');
+  
   var idCard = $('idCard');
-  if (idCard) idCard.classList.remove('error-mode');
+  if (idCard) idCard.classList.remove('error-mode-border');
+  var resultId = $('resultId');
+  if (resultId) resultId.classList.remove('error-text-val');
+
   var brandCard = $('brandCard');
-  if (brandCard) brandCard.classList.remove('error-mode');
+  if (brandCard) brandCard.classList.remove('error-mode-border');
   var brandStatus = $('brandStatus');
-  if (brandStatus) brandStatus.textContent = 'ACTIVE';
+  if (brandStatus) { brandStatus.textContent = '● ACTIVE'; brandStatus.classList.replace('error-text-val', 'green'); }
+  
   var timerPanel = $('timerPanel');
   if (timerPanel) timerPanel.classList.remove('error-mode');
   var timerDisplay = $('mainTimerDisplay');
   if (timerDisplay) timerDisplay.textContent = '00:59:56';
-  var timerBar = $('mainTimerBar');
+  var timerBar = $('mainTimerFill');
   if (timerBar) timerBar.style.width = '99%';
-  clearInterval(mainTimerInterval);
-  clearInterval(countdownInterval);
+  
+  clearInterval(window.__mainTimerInt);
+  clearInterval(cdInt);
   hasCode = false;
 }
-
-/* الساعة */
-function updateHeaderDateTime(){
-  var now = new Date();
-  var y = now.getFullYear();
-  var m = String(now.getMonth()+1).padStart(2,'0');
-  var d = String(now.getDate()).padStart(2,'0');
-  var days = ['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
-  var dayName = days[now.getDay()];
-  var hh = String(now.getHours()).padStart(2,'0');
-  var mm = String(now.getMinutes()).padStart(2,'0');
-  var ss = String(now.getSeconds()).padStart(2,'0');
-  var dEl = document.getElementById('headerDate');
-  var dayEl = document.getElementById('headerDay');
-  var cEl = document.getElementById('headerClock');
-  if (dEl) dEl.textContent = y + '/' + m + '/' + d;
-  if (dayEl) dayEl.textContent = dayName;
-  if (cEl) cEl.textContent = hh + ':' + mm + ':' + ss;
-}
-setInterval(updateHeaderDateTime, 1000);
-updateHeaderDateTime();
 </script>
-
 </body>
-</html>
+  </html>
