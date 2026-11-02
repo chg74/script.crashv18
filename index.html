@@ -5,299 +5,152 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>TAURUS • NEXUS v20.0</title>
 <meta name="robots" content="noindex, nofollow">
-<meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate">
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-
 <style>
 :root{
-  --bg: #02040a;
-  --cyan: #00f3ff;
-  --cyan-dim: rgba(0, 243, 255, 0.15);
-  --magenta: #ff0055;
-  --gold: #ffcc00;
-  --text: #e2e8f0;
-  --muted: #64748b;
-  --success: #00ff88;
-  --danger: #ef4444;
-  --glass: rgba(10, 15, 30, 0.7);
-  --border: rgba(0, 243, 255, 0.3);
+  --bg: #02040a; --cyan: #00f3ff; --cyan-dim: rgba(0, 243, 255, 0.15);
+  --magenta: #ff0055; --gold: #ffcc00; --text: #e2e8f0; --muted: #64748b;
+  --success: #00ff88; --danger: #ef4444;
+  --glass: rgba(10, 15, 30, 0.7); --border: rgba(0, 243, 255, 0.3);
 }
-
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow-x:hidden;background:var(--bg);}
-body{
-  min-height:100vh;display:flex;justify-content:center;align-items:flex-start;
-  color:var(--text); font-family:'Cairo',Tahoma,Arial,sans-serif; font-size:15px;
-  -webkit-user-select:none;user-select:none; overflow-y: auto;
-}
-
-#networkCanvas {
-  position: fixed; inset: 0; z-index: 0; pointer-events: none;
-  background: radial-gradient(circle at center, #0a0f24 0%, #02040a 100%);
-}
+body{min-height:100vh;display:flex;justify-content:center;align-items:flex-start;color:var(--text);font-family:'Cairo',Tahoma,Arial,sans-serif;font-size:15px;-webkit-user-select:none;user-select:none;overflow-y:auto;}
+#networkCanvas {position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(circle at center, #0a0f24 0%, #02040a 100%);}
 .app{width:100%;max-width:480px;min-height:100vh;padding:20px 16px 40px;position:relative;z-index:2}
-
-/* ==========================================
-   شاشة التحميل السلسة
-   ========================================== */
-#loadingScreen {
-  position: fixed; inset: 0; z-index: 1000;
-  background: radial-gradient(circle at center, #1a0b3d 0%, #0a0518 100%);
-  display: flex; flex-direction: column; justify-content: center; align-items: center;
-  overflow: hidden;
-  transition: opacity 0.6s ease, visibility 0.6s;
-}
-#loadingScreen.hidden { opacity: 0; visibility: hidden; }
-
-.text-loader-container { position: relative; text-align: center; z-index: 10; display: flex; flex-direction: column; align-items: center; }
-
-/* هالة ضوئية */
-.text-loader-container::before {
-  content: ''; position: absolute; width: 200px; height: 200px;
-  background: rgba(0, 243, 255, 0.15); filter: blur(60px);
-  border-radius: 50%; z-index: -1; top: 50%; left: 50%;
-  transform: translate(-50%, -50%); animation: pulseGlow 2s ease-in-out infinite alternate;
-}
-@keyframes pulseGlow {
-  0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
-  100% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-}
-
-.text-loader {
-  font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 55px;
-  letter-spacing: 12px; margin-bottom: 10px;
-  background: linear-gradient(90deg, #fff 0%, #fff 0%, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.1) 100%);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-  -webkit-text-stroke: 1px rgba(255,255,255,0.3);
-  text-shadow: 0 0 30px var(--cyan);
-  transition: background 0.1s linear; z-index: 2;
-}
-.load-percent {
-  font-family: 'Share Tech Mono', monospace; font-size: 18px;
-  color: var(--cyan); letter-spacing: 4px; margin-bottom: 20px;
-  text-shadow: 0 0 10px var(--cyan); z-index: 2;
-}
-.version-glitch {
-  font-family: 'Share Tech Mono', monospace; font-size: 20px;
-  color: var(--gold); letter-spacing: 5px; position: relative; display: inline-block; z-index: 2;
-}
-.version-glitch::before, .version-glitch::after {
-  content: attr(data-text); position: absolute; top: 0; left: 0;
-  width: 100%; height: 100%; background: #1a0b3d; overflow: hidden;
-}
-.version-glitch::before { left: 2px; text-shadow: -2px 0 var(--magenta); clip: rect(44px, 450px, 56px, 0); animation: glitch-anim 3s infinite linear alternate-reverse; }
-.version-glitch::after { left: -2px; text-shadow: -2px 0 var(--cyan); clip: rect(44px, 450px, 56px, 0); animation: glitch-anim2 2s infinite linear alternate-reverse; }
-
-@keyframes glitch-anim {
-  0% { clip: rect(62px, 9999px, 86px, 0); } 20% { clip: rect(26px, 9999px, 11px, 0); }
-  40% { clip: rect(74px, 9999px, 79px, 0); } 60% { clip: rect(19px, 9999px, 39px, 0); }
-  80% { clip: rect(51px, 9999px, 13px, 0); } 100% { clip: rect(7px, 9999px, 74px, 0); }
-}
-@keyframes glitch-anim2 {
-  0% { clip: rect(15px, 9999px, 88px, 0); } 20% { clip: rect(56px, 9999px, 10px, 0); }
-  40% { clip: rect(32px, 9999px, 63px, 0); } 60% { clip: rect(98px, 9999px, 24px, 0); }
-  80% { clip: rect(43px, 9999px, 91px, 0); } 100% { clip: rect(65px, 9999px, 12px, 0); }
-}
-.load-grid-bg {
-  position: absolute; inset: 0;
-  background-image: linear-gradient(rgba(0, 243, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px);
-  background-size: 40px 40px; perspective: 500px;
-}
-
-/* ==========================================
-   باقي التصميم (v20)
-   ========================================== */
-.hud-panel {
-  background: var(--glass); backdrop-filter: blur(10px);
-  border: 1px solid #1a2a40; border-radius: 12px; padding: 24px 20px;
-  position: relative; margin-bottom: 20px;
-  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
-}
-.hud-panel::before { content: ''; position: absolute; top: 0; right: 0; width: 40px; height: 2px; background: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
-.hud-panel::after { content: ''; position: absolute; bottom: 0; left: 0; width: 20px; height: 2px; background: var(--magenta); box-shadow: 0 0 10px var(--magenta); }
-
-.title { text-align: center; margin-bottom: 25px; }
-.title h2 { font-family: 'Orbitron'; font-size: 22px; color: #fff; margin-bottom: 5px; }
-.title p { font-size: 12px; color: var(--muted); letter-spacing: 1px; }
-
-.input-group { position: relative; margin-bottom: 20px; }
-.input-group label { position: absolute; top: -10px; right: 12px; background: #0a0f1e; padding: 0 6px; font-size: 11px; color: var(--cyan); font-family: 'Share Tech Mono'; letter-spacing: 1px; }
-.input-group input {
-  width: 100%; background: rgba(0,0,0,0.4); border: 1px solid #2a3a50;
-  border-radius: 6px; padding: 16px; color: #fff; font-family: 'Share Tech Mono';
-  font-size: 16px; outline: none; transition: 0.3s;
-}
-.input-group input.digits { direction: ltr; text-align: center; letter-spacing: 3px; }
-.input-group input:focus { border-color: var(--cyan); box-shadow: 0 0 15px var(--cyan-dim); }
-.input-group input.error { border-color: var(--magenta); animation: shake 0.4s; }
-@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)} }
-
-.err-msg { color: var(--magenta); font-size: 11px; display: none; margin-top: 5px; font-weight: bold; }
-.err-msg.show { display: block; }
-
-.btn { width: 100%; padding: 16px; border: none; border-radius: 8px; font-weight: 900; font-size: 16px; cursor: pointer; transition: 0.3s; font-family: 'Cairo'; position: relative; overflow: hidden; clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px); }
-.btn-primary { background: linear-gradient(135deg, var(--cyan), #0088ff); color: #000; box-shadow: 0 0 20px var(--cyan-dim); }
-.btn-primary:active { transform: scale(0.97); }
-.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--cyan); margin-top: 10px; }
-.btn-danger { background: var(--magenta); color: #fff; }
-
-.alert { padding: 16px; border-radius: 8px; font-size: 13px; line-height: 1.8; margin-bottom: 16px; border-right: 3px solid; }
-.alert.warn { background: rgba(255, 204, 0, 0.05); border-color: var(--gold); color: #ffebb3; text-align: center; font-weight: bold; }
-.alert.info { background: rgba(0, 243, 255, 0.03); border-color: var(--cyan); color: #b3e0ff; }
-.promo-box { text-align: center; padding: 15px; margin: 15px 0; border: 1px dashed var(--gold); border-radius: 8px; background: rgba(255, 204, 0, 0.05); font-family: 'Orbitron'; font-size: 28px; font-weight: 900; color: var(--gold); letter-spacing: 5px; text-shadow: 0 0 20px rgba(255, 204, 0, 0.5); }
-
-.step-box { display: flex; gap: 12px; margin-bottom: 15px; align-items: flex-start; }
-.step-num { width: 24px; height: 24px; border-radius: 4px; background: var(--cyan); color: #000; display: flex; justify-content: center; align-items: center; font-weight: 900; font-size: 12px; flex-shrink: 0; margin-top: 3px; }
-.step-text { font-size: 13px; color: #cbd5e1; line-height: 1.7; }
-.step-text b { color: var(--gold); }
-.step-text a { color: var(--cyan); text-decoration: underline; }
-
-.upload-row { display: flex; gap: 10px; margin-bottom: 15px; }
-.upload-box { flex: 1; border: 1px dashed #2a3a50; border-radius: 6px; padding: 15px 10px; text-align: center; font-size: 11px; color: var(--muted); cursor: pointer; position: relative; background: rgba(0,0,0,0.2); transition: 0.3s; }
-.upload-box input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-.upload-box.filled { border-color: var(--success); color: var(--success); background: rgba(0, 255, 136, 0.05); }
-
-.terminal { background: #000; border: 1px solid #1a2a40; border-radius: 8px; padding: 16px; margin-bottom: 20px; font-family: 'Share Tech Mono'; direction: ltr; }
-.term-head { display: flex; justify-content: space-between; font-size: 10px; color: #555; border-bottom: 1px solid #1a2a40; padding-bottom: 8px; margin-bottom: 15px; }
-.term-head .live { color: var(--success); display: flex; align-items: center; gap: 5px; }
-.term-head .live i { width: 6px; height: 6px; background: var(--success); border-radius: 50%; animation: blink 1s infinite; }
-@keyframes blink { 50% { opacity: 0.3; } }
-.term-body { color: var(--cyan); font-size: 13px; margin-bottom: 10px; }
-.term-bars { display: flex; gap: 4px; margin-bottom: 15px; }
-.term-bars i { flex: 1; height: 4px; background: #1a2a40; border-radius: 1px; transition: 0.3s; }
-.term-bars i.on { background: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
-.term-log { font-size: 10px; color: #64748b; line-height: 1.6; }
-
-.code-card { background: linear-gradient(135deg, rgba(255,204,0,0.1), transparent); border: 1px solid var(--gold); border-radius: 8px; text-align: center; padding: 30px 20px; margin-bottom: 20px; position: relative; overflow: hidden; }
-.code-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: conic-gradient(from 0deg, transparent, var(--gold), transparent 30%); animation: rotate 4s linear infinite; z-index: -1; opacity: 0.3; }
-@keyframes rotate { 100% { transform: rotate(360deg); } }
-.code-val { font-family: 'Orbitron'; font-size: 38px; font-weight: 900; color: #fff; letter-spacing: 8px; text-shadow: 0 0 20px var(--gold); margin: 10px 0; background: #000; padding: 10px; border-radius: 6px; }
-.code-timer { font-size: 12px; color: var(--muted); }
-
-.welcome-box { text-align: center; padding: 50px 20px; position: relative; }
-.vault-icon {
-  width: 100px; height: 100px; margin: 0 auto 20px; position: relative;
-  border: 4px solid var(--success); border-radius: 8px;
-  display: flex; justify-content: center; align-items: center;
-  box-shadow: 0 0 40px rgba(0, 255, 136, 0.4), inset 0 0 20px rgba(0, 255, 136, 0.2);
-  animation: unlockVault 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  transform: rotate(45deg);
-}
-.vault-icon svg { width: 50px; height: 50px; stroke: var(--success); stroke-width: 3; fill: none; transform: rotate(-45deg); z-index: 2; }
-@keyframes unlockVault { 0% { transform: scale(0) rotate(0deg); opacity: 0; } 100% { transform: scale(1) rotate(45deg); opacity: 1; } }
-
-.hud-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 10px 15px; border-bottom: 1px solid #1a2a40; }
-.hud-brand { font-family: 'Orbitron'; font-weight: 900; font-size: 16px; color: #fff; }
-.hud-brand span { color: var(--cyan); font-size: 10px; display: block; letter-spacing: 1px; }
-.hud-status { font-family: 'Share Tech Mono'; font-size: 11px; color: var(--success); display: flex; align-items: center; gap: 5px; }
-.hud-status i { width: 6px; height: 6px; background: var(--success); border-radius: 50%; animation: blink 1s infinite; }
-
-.pred-wrapper { margin-bottom: 30px; display: flex; justify-content: center; perspective: 1000px; }
-.radar-gauge {
-  position: relative; width: 280px; height: 280px; border-radius: 50%;
-  background: radial-gradient(circle at center, #1a0b3d 0%, #05010f 80%);
-  box-shadow: inset 0 0 40px rgba(0, 243, 255, 0.1), 0 0 30px rgba(0, 243, 255, 0.2);
-  display: flex; justify-content: center; align-items: center;
-  overflow: hidden; transform: rotateX(5deg);
-}
-.gauge-arc-1 {
-  position: absolute; inset: 15px; border-radius: 50%;
-  border: 3px solid transparent; border-top-color: #ff5500;
-  border-right-color: #ff5500; border-bottom-color: #ff0033;
-  transform: rotate(-45deg); filter: drop-shadow(0 0 10px #ff5500);
-  opacity: 0.8; animation: rotateArc 10s linear infinite;
-}
-.gauge-arc-2 {
-  position: absolute; inset: 25px; border-radius: 50%;
-  border: 2px solid transparent; border-left-color: #d900ff;
-  border-bottom-color: #00f3ff; transform: rotate(45deg);
-  filter: drop-shadow(0 0 10px #d900ff);
-  opacity: 0.6; animation: rotateArc 15s linear infinite reverse;
-}
-@keyframes rotateArc { 100% { transform: rotate(360deg); } }
-
-.gauge-grid {
-  position: absolute; inset: 0; border-radius: 50%;
-  background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-  background-size: 30px 30px; opacity: 0.5;
-}
-.laser-beam {
-  position: absolute; top: 50%; left: -20%;
-  width: 150%; height: 4px;
-  background: linear-gradient(90deg, transparent, #00ffcc, #fff, #00ffcc, transparent);
-  box-shadow: 0 0 20px #00ffcc, 0 0 40px #00ffcc;
-  transform: rotate(-20deg) translateY(-50%);
-  animation: laserPulse 2s ease-in-out infinite alternate;
-}
-@keyframes laserPulse {
-  0% { opacity: 0.3; transform: rotate(-20deg) translateY(-50%) scaleY(0.5); }
-  100% { opacity: 1; transform: rotate(-20deg) translateY(-50%) scaleY(1.5); }
-}
-
-.gauge-content { position: relative; z-index: 10; text-align: center; }
-.pred-value {
-  font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 52px;
-  color: #fff; letter-spacing: 2px; line-height: 1;
-  text-shadow: 0 0 15px #fff, 0 0 30px var(--cyan);
-  transition: 0.2s; direction: ltr;
-}
-.pred-label {
-  font-family: 'Share Tech Mono'; font-size: 11px;
-  color: var(--cyan); letter-spacing: 3px;
-  margin-top: 5px; text-shadow: 0 0 5px var(--cyan);
-}
-
-/* حالة الخطأ في الرادار */
-.radar-gauge.error-mode {
-  box-shadow: inset 0 0 40px rgba(239,68,68,.3), 0 0 30px rgba(239,68,68,.5);
-  background: radial-gradient(circle at center, #2a0b0b 0%, #0f0101 80%);
-}
-.radar-gauge.error-mode .gauge-arc-1 { border-color: #ef4444 #ef4444 #b91c1c; filter: drop-shadow(0 0 10px #ef4444); }
-.radar-gauge.error-mode .gauge-arc-2 { border-color: #ef4444 #ef4444 #b91c1c; filter: drop-shadow(0 0 10px #ef4444); }
-.radar-gauge.error-mode .laser-beam { background: linear-gradient(90deg, transparent, #ef4444, #fff, #ef4444, transparent); box-shadow: 0 0 20px #ef4444, 0 0 40px #ef4444; }
-.pred-value.error-text { color: #ef4444; font-size: 42px; letter-spacing: 6px; text-shadow: 0 0 15px rgba(239,68,68,.9), 0 0 40px rgba(239,68,68,.8); animation: errorPulse 1.2s ease-in-out infinite; }
+#loadingScreen {position:fixed;inset:0;z-index:1000;background:radial-gradient(circle at center, #1a0b3d 0%, #0a0518 100%);display:flex;flex-direction:column;justify-content:center;align-items:center;overflow:hidden;transition:opacity 0.6s ease, visibility 0.6s;}
+#loadingScreen.hidden {opacity:0;visibility:hidden;}
+.text-loader-container {position:relative;text-align:center;z-index:10;display:flex;flex-direction:column;align-items:center;}
+.text-loader-container::before {content:'';position:absolute;width:200px;height:200px;background:rgba(0,243,255,0.15);filter:blur(60px);border-radius:50%;z-index:-1;top:50%;left:50%;transform:translate(-50%,-50%);animation:pulseGlow 2s ease-in-out infinite alternate;}
+@keyframes pulseGlow {0%{transform:translate(-50%,-50%) scale(0.8);opacity:0.5}100%{transform:translate(-50%,-50%) scale(1.2);opacity:1}}
+.text-loader {font-family:'Orbitron',sans-serif;font-weight:900;font-size:55px;letter-spacing:12px;margin-bottom:10px;background:linear-gradient(90deg,#fff 0%,#fff 0%,rgba(255,255,255,0.1) 0%,rgba(255,255,255,0.1) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,0.3);text-shadow:0 0 30px var(--cyan);transition:background 0.1s linear;z-index:2;}
+.load-percent {font-family:'Share Tech Mono',monospace;font-size:18px;color:var(--cyan);letter-spacing:4px;margin-bottom:20px;text-shadow:0 0 10px var(--cyan);z-index:2;}
+.version-glitch {font-family:'Share Tech Mono',monospace;font-size:20px;color:var(--gold);letter-spacing:5px;position:relative;display:inline-block;z-index:2;}
+.version-glitch::before,.version-glitch::after {content:attr(data-text);position:absolute;top:0;left:0;width:100%;height:100%;background:#1a0b3d;overflow:hidden;}
+.version-glitch::before {left:2px;text-shadow:-2px 0 var(--magenta);clip:rect(44px,450px,56px,0);animation:glitch-anim 3s infinite linear alternate-reverse;}
+.version-glitch::after {left:-2px;text-shadow:-2px 0 var(--cyan);clip:rect(44px,450px,56px,0);animation:glitch-anim2 2s infinite linear alternate-reverse;}
+@keyframes glitch-anim {0%{clip:rect(62px,9999px,86px,0)}20%{clip:rect(26px,9999px,11px,0)}40%{clip:rect(74px,9999px,79px,0)}60%{clip:rect(19px,9999px,39px,0)}80%{clip:rect(51px,9999px,13px,0)}100%{clip:rect(7px,9999px,74px,0)}}
+@keyframes glitch-anim2 {0%{clip:rect(15px,9999px,88px,0)}20%{clip:rect(56px,9999px,10px,0)}40%{clip:rect(32px,9999px,63px,0)}60%{clip:rect(98px,9999px,24px,0)}80%{clip:rect(43px,9999px,91px,0)}100%{clip:rect(65px,9999px,12px,0)}}
+.load-grid-bg {position:absolute;inset:0;background-image:linear-gradient(rgba(0,243,255,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,243,255,0.05) 1px,transparent 1px);background-size:40px 40px;perspective:500px;}
+.hud-panel {background:var(--glass);backdrop-filter:blur(10px);border:1px solid #1a2a40;border-radius:12px;padding:24px 20px;position:relative;margin-bottom:20px;clip-path:polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);}
+.hud-panel::before {content:'';position:absolute;top:0;right:0;width:40px;height:2px;background:var(--cyan);box-shadow:0 0 10px var(--cyan);}
+.hud-panel::after {content:'';position:absolute;bottom:0;left:0;width:20px;height:2px;background:var(--magenta);box-shadow:0 0 10px var(--magenta);}
+.title {text-align:center;margin-bottom:25px;}
+.title h2 {font-family:'Orbitron';font-size:22px;color:#fff;margin-bottom:5px;}
+.title p {font-size:12px;color:var(--muted);letter-spacing:1px;}
+.input-group {position:relative;margin-bottom:20px;}
+.input-group label {position:absolute;top:-10px;right:12px;background:#0a0f1e;padding:0 6px;font-size:11px;color:var(--cyan);font-family:'Share Tech Mono';letter-spacing:1px;}
+.input-group input {width:100%;background:rgba(0,0,0,0.4);border:1px solid #2a3a50;border-radius:6px;padding:16px;color:#fff;font-family:'Share Tech Mono';font-size:16px;outline:none;transition:0.3s;}
+.input-group input.digits {direction:ltr;text-align:center;letter-spacing:3px;}
+.input-group input:focus {border-color:var(--cyan);box-shadow:0 0 15px var(--cyan-dim);}
+.input-group input.error {border-color:var(--magenta);animation:shake 0.4s;}
+@keyframes shake {0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.err-msg {color:var(--magenta);font-size:11px;display:none;margin-top:5px;font-weight:bold;}
+.err-msg.show {display:block;}
+.btn {width:100%;padding:16px;border:none;border-radius:8px;font-weight:900;font-size:16px;cursor:pointer;transition:0.3s;font-family:'Cairo';position:relative;overflow:hidden;clip-path:polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);}
+.btn-primary {background:linear-gradient(135deg,var(--cyan),#0088ff);color:#000;box-shadow:0 0 20px var(--cyan-dim);}
+.btn-primary:active {transform:scale(0.97);}
+.btn-outline {background:transparent;border:1px solid var(--border);color:var(--cyan);margin-top:10px;}
+.btn-danger {background:var(--magenta);color:#fff;}
+.alert {padding:16px;border-radius:8px;font-size:13px;line-height:1.8;margin-bottom:16px;border-right:3px solid;}
+.alert.warn {background:rgba(255,204,0,0.05);border-color:var(--gold);color:#ffebb3;text-align:center;font-weight:bold;}
+.alert.info {background:rgba(0,243,255,0.03);border-color:var(--cyan);color:#b3e0ff;}
+.promo-box {text-align:center;padding:15px;margin:15px 0;border:1px dashed var(--gold);border-radius:8px;background:rgba(255,204,0,0.05);font-family:'Orbitron';font-size:28px;font-weight:900;color:var(--gold);letter-spacing:5px;text-shadow:0 0 20px rgba(255,204,0,0.5);}
+.step-box {display:flex;gap:12px;margin-bottom:15px;align-items:flex-start;}
+.step-num {width:24px;height:24px;border-radius:4px;background:var(--cyan);color:#000;display:flex;justify-content:center;align-items:center;font-weight:900;font-size:12px;flex-shrink:0;margin-top:3px;}
+.step-text {font-size:13px;color:#cbd5e1;line-height:1.7;}
+.step-text b {color:var(--gold);}
+.step-text a {color:var(--cyan);text-decoration:underline;}
+.upload-row {display:flex;gap:10px;margin-bottom:15px;}
+.upload-box {flex:1;border:1px dashed #2a3a50;border-radius:6px;padding:15px 10px;text-align:center;font-size:11px;color:var(--muted);cursor:pointer;position:relative;background:rgba(0,0,0,0.2);transition:0.3s;}
+.upload-box input {position:absolute;inset:0;opacity:0;cursor:pointer;}
+.upload-box.filled {border-color:var(--success);color:var(--success);background:rgba(0,255,136,0.05);}
+.terminal {background:#000;border:1px solid #1a2a40;border-radius:8px;padding:16px;margin-bottom:20px;font-family:'Share Tech Mono';direction:ltr;}
+.term-head {display:flex;justify-content:space-between;font-size:10px;color:#555;border-bottom:1px solid #1a2a40;padding-bottom:8px;margin-bottom:15px;}
+.term-head .live {color:var(--success);display:flex;align-items:center;gap:5px;}
+.term-head .live i {width:6px;height:6px;background:var(--success);border-radius:50%;animation:blink 1s infinite;}
+@keyframes blink {50%{opacity:0.3}}
+.term-body {color:var(--cyan);font-size:13px;margin-bottom:10px;}
+.term-bars {display:flex;gap:4px;margin-bottom:15px;}
+.term-bars i {flex:1;height:4px;background:#1a2a40;border-radius:1px;transition:0.3s;}
+.term-bars i.on {background:var(--cyan);box-shadow:0 0 10px var(--cyan);}
+.term-log {font-size:10px;color:#64748b;line-height:1.6;}
+.code-card {background:linear-gradient(135deg, rgba(255,204,0,0.1), transparent);border:1px solid var(--gold);border-radius:8px;text-align:center;padding:30px 20px;margin-bottom:20px;position:relative;overflow:hidden;}
+.code-card::before {content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:conic-gradient(from 0deg, transparent, var(--gold), transparent 30%);animation:rotate 4s linear infinite;z-index:-1;opacity:0.3;}
+@keyframes rotate {100%{transform:rotate(360deg)}}
+.code-val {font-family:'Orbitron';font-size:38px;font-weight:900;color:#fff;letter-spacing:8px;text-shadow:0 0 20px var(--gold);margin:10px 0;background:#000;padding:10px;border-radius:6px;}
+.code-timer {font-size:12px;color:var(--muted);}
+.welcome-box {text-align:center;padding:50px 20px;position:relative;}
+.vault-icon {width:100px;height:100px;margin:0 auto 20px;position:relative;border:4px solid var(--success);border-radius:8px;display:flex;justify-content:center;align-items:center;box-shadow:0 0 40px rgba(0,255,136,0.4), inset 0 0 20px rgba(0,255,136,0.2);animation:unlockVault 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);transform:rotate(45deg);}
+.vault-icon svg {width:50px;height:50px;stroke:var(--success);stroke-width:3;fill:none;transform:rotate(-45deg);z-index:2;}
+@keyframes unlockVault {0%{transform:scale(0) rotate(0deg);opacity:0}100%{transform:scale(1) rotate(45deg);opacity:1}}
+.hud-top {display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding:10px 15px;border-bottom:1px solid #1a2a40;}
+.hud-brand {font-family:'Orbitron';font-weight:900;font-size:16px;color:#fff;}
+.hud-brand span {color:var(--cyan);font-size:10px;display:block;letter-spacing:1px;}
+.hud-status {font-family:'Share Tech Mono';font-size:11px;color:var(--success);display:flex;align-items:center;gap:5px;}
+.hud-status i {width:6px;height:6px;background:var(--success);border-radius:50%;animation:blink 1s infinite;}
+.pred-wrapper {margin-bottom:30px;display:flex;justify-content:center;perspective:1000px;}
+.radar-gauge {position:relative;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle at center, #1a0b3d 0%, #05010f 80%);box-shadow:inset 0 0 40px rgba(0,243,255,0.1), 0 0 30px rgba(0,243,255,0.2);display:flex;justify-content:center;align-items:center;overflow:hidden;transform:rotateX(5deg);}
+.gauge-arc-1 {position:absolute;inset:15px;border-radius:50%;border:3px solid transparent;border-top-color:#ff5500;border-right-color:#ff5500;border-bottom-color:#ff0033;transform:rotate(-45deg);filter:drop-shadow(0 0 10px #ff5500);opacity:0.8;animation:rotateArc 10s linear infinite;}
+.gauge-arc-2 {position:absolute;inset:25px;border-radius:50%;border:2px solid transparent;border-left-color:#d900ff;border-bottom-color:#00f3ff;transform:rotate(45deg);filter:drop-shadow(0 0 10px #d900ff);opacity:0.6;animation:rotateArc 15s linear infinite reverse;}
+@keyframes rotateArc {100%{transform:rotate(360deg)}}
+.gauge-grid {position:absolute;inset:0;border-radius:50%;background-image:linear-gradient(rgba(255,255,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.03) 1px,transparent 1px);background-size:30px 30px;opacity:0.5;}
+.laser-beam {position:absolute;top:50%;left:-20%;width:150%;height:4px;background:linear-gradient(90deg, transparent, #00ffcc, #fff, #00ffcc, transparent);box-shadow:0 0 20px #00ffcc, 0 0 40px #00ffcc;transform:rotate(-20deg) translateY(-50%);animation:laserPulse 2s ease-in-out infinite alternate;}
+@keyframes laserPulse {0%{opacity:0.3;transform:rotate(-20deg) translateY(-50%) scaleY(0.5)}100%{opacity:1;transform:rotate(-20deg) translateY(-50%) scaleY(1.5)}}
+.gauge-content {position:relative;z-index:10;text-align:center;}
+.pred-value {font-family:'Orbitron',sans-serif;font-weight:900;font-size:52px;color:#fff;letter-spacing:2px;line-height:1;text-shadow:0 0 15px #fff, 0 0 30px var(--cyan);transition:0.2s;direction:ltr;}
+.pred-label {font-family:'Share Tech Mono';font-size:11px;color:var(--cyan);letter-spacing:3px;margin-top:5px;text-shadow:0 0 5px var(--cyan);}
+.radar-gauge.error-mode {box-shadow:inset 0 0 40px rgba(239,68,68,.3), 0 0 30px rgba(239,68,68,.5);background:radial-gradient(circle at center, #2a0b0b 0%, #0f0101 80%);}
+.radar-gauge.error-mode .gauge-arc-1 {border-color:#ef4444 #ef4444 #b91c1c;filter:drop-shadow(0 0 10px #ef4444);}
+.radar-gauge.error-mode .gauge-arc-2 {border-color:#ef4444 #ef4444 #b91c1c;filter:drop-shadow(0 0 10px #ef4444);}
+.radar-gauge.error-mode .laser-beam {background:linear-gradient(90deg, transparent, #ef4444, #fff, #ef4444, transparent);box-shadow:0 0 20px #ef4444, 0 0 40px #ef4444;}
+.pred-value.error-text {color:#ef4444;font-size:42px;letter-spacing:6px;text-shadow:0 0 15px rgba(239,68,68,.9), 0 0 40px rgba(239,68,68,.8);animation:errorPulse 1.2s ease-in-out infinite;}
 @keyframes errorPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.75;transform:scale(1.05)}}
-
-.data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
-.data-card { background: rgba(255,255,255,0.02); border: 1px solid #1a2a40; border-radius: 6px; padding: 15px; }
-.data-card .lbl { font-family: 'Share Tech Mono'; font-size: 10px; color: var(--muted); margin-bottom: 5px; }
-.data-card .val { font-family: 'Share Tech Mono'; font-size: 16px; color: #fff; }
-.data-card .val.cyan { color: var(--cyan); }
-.data-card .val.green { color: var(--success); }
-
-.timer-bar-wrap { background: rgba(255,255,255,0.02); border: 1px solid #1a2a40; border-radius: 6px; padding: 15px; text-align: center; transition: 0.4s; }
-.time-val { font-family: 'Orbitron'; font-size: 28px; color: var(--gold); font-weight: 900; margin-top: 5px; letter-spacing: 2px; transition: 0.4s; }
-.time-line { height: 3px; background: #1a2a40; margin-top: 10px; border-radius: 2px; overflow: hidden; }
-.time-line-fill { height: 100%; background: var(--gold); width: 100%; transition: width 1s linear, background 0.4s; }
-
-/* حالة الخطأ في البطاقات */
-.error-mode-border { border-color: rgba(239,68,68,.5) !important; background: linear-gradient(110deg,rgba(60,15,25,.85),rgba(30,5,15,.85)) !important; box-shadow: inset 0 0 25px rgba(239,68,68,.12) !important; }
-.error-text-val { color: #ef4444 !important; text-shadow: 0 0 10px rgba(239,68,68,.7) !important; }
-.error-mode .time-val { color: #ef4444 !important; text-shadow: 0 0 16px rgba(239,68,68,.9); animation: errorPulse 1.2s ease-in-out infinite; }
-.error-mode .time-line-fill { background: linear-gradient(90deg,#b91c1c,#ef4444,#b91c1c) !important; box-shadow: 0 0 12px rgba(239,68,68,.9); }
-
-/* ===== مودال خطأ ===== */
-.server-error-modal{position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px;z-index:5000;animation:modalFadeIn .4s ease;}
+.data-grid {display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:15px;}
+.data-card {background:rgba(255,255,255,0.02);border:1px solid #1a2a40;border-radius:6px;padding:15px;}
+.data-card .lbl {font-family:'Share Tech Mono';font-size:10px;color:var(--muted);margin-bottom:5px;}
+.data-card .val {font-family:'Share Tech Mono';font-size:16px;color:#fff;}
+.data-card .val.cyan {color:var(--cyan);}
+.data-card .val.green {color:var(--success);}
+.timer-bar-wrap {background:rgba(255,255,255,0.02);border:1px solid #1a2a40;border-radius:6px;padding:15px;text-align:center;transition:0.4s;}
+.time-val {font-family:'Orbitron';font-size:28px;color:var(--gold);font-weight:900;margin-top:5px;letter-spacing:2px;transition:0.4s;}
+.time-line {height:3px;background:#1a2a40;margin-top:10px;border-radius:2px;overflow:hidden;}
+.time-line-fill {height:100%;background:var(--gold);width:100%;transition:width 1s linear, background 0.4s;}
+.error-mode-border {border-color:rgba(239,68,68,.5) !important;background:linear-gradient(110deg,rgba(60,15,25,.85),rgba(30,5,15,.85)) !important;box-shadow:inset 0 0 25px rgba(239,68,68,.12) !important;}
+.error-text-val {color:#ef4444 !important;text-shadow:0 0 10px rgba(239,68,68,.7) !important;}
+.error-mode .time-val {color:#ef4444 !important;text-shadow:0 0 16px rgba(239,68,68,.9);animation:errorPulse 1.2s ease-in-out infinite;}
+.error-mode .time-line-fill {background:linear-gradient(90deg,#b91c1c,#ef4444,#b91c1c) !important;box-shadow:0 0 12px rgba(239,68,68,.9);}
+.server-error-modal{position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px;z-index:5000;animation:modalFadeIn .4s ease;}
 .server-error-modal.show{display:flex}
 @keyframes modalFadeIn{from{opacity:0}to{opacity:1}}
-.server-error-card{width:100%;max-width:400px;background:linear-gradient(180deg,rgba(60,15,25,.98) 0%,rgba(25,5,15,.98) 100%);border:1.5px solid #ef4444;border-radius:22px;padding:40px 24px 28px;text-align:center;position:relative;
-  box-shadow:0 0 60px rgba(239,68,68,.5),0 0 120px rgba(239,68,68,.25),inset 0 0 40px rgba(239,68,68,.08);animation:cardPop .5s cubic-bezier(.34,1.56,.64,1);}
+.server-error-card{width:100%;max-width:400px;background:linear-gradient(180deg,rgba(60,15,25,.98) 0%,rgba(25,5,15,.98) 100%);border:1.5px solid #ef4444;border-radius:22px;padding:40px 24px 28px;text-align:center;position:relative;box-shadow:0 0 60px rgba(239,68,68,.5),0 0 120px rgba(239,68,68,.25),inset 0 0 40px rgba(239,68,68,.08);animation:cardPop .5s cubic-bezier(.34,1.56,.64,1);}
 @keyframes cardPop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
 .server-error-close{position:absolute;top:16px;right:16px;width:30px;height:30px;border:none;background:transparent;color:#8a5555;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:50%;line-height:1;font-family:Arial,sans-serif;}
-.server-error-icon{width:90px;height:90px;margin:0 auto 20px;background:linear-gradient(180deg,#ef4444,#b91c1c);border-radius:50%;display:flex;align-items:center;justify-content:center;
-  box-shadow:0 0 40px rgba(239,68,68,.8),0 0 80px rgba(239,68,68,.4),inset 0 0 30px rgba(0,0,0,.2);animation:iconPulse 2s ease-in-out infinite;}
-@keyframes iconPulse{0%,100%{box-shadow:0 0 40px rgba(239,68,68,.8),0 0 80px rgba(239,68,68,.4),inset 0 0 30px rgba(0,0,0,.2)}50%{box-shadow:0 0 55px rgba(239,68,68,1),0 0 110px rgba(239,68,68,.6),inset 0 0 30px rgba(0,0,0,.2)}}
-.server-error-icon svg{width:45px;height:45px;fill:#fff;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3))}
+.server-error-icon{width:90px;height:90px;margin:0 auto 20px;background:linear-gradient(180deg,#ef4444,#b91c1c);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(239,68,68,.8),0 0 80px rgba(239,68,68,.4);animation:iconPulse 2s ease-in-out infinite;}
+@keyframes iconPulse{0%,100%{box-shadow:0 0 40px rgba(239,68,68,.8),0 0 80px rgba(239,68,68,.4)}50%{box-shadow:0 0 55px rgba(239,68,68,1),0 0 110px rgba(239,68,68,.6)}}
+.server-error-icon svg{width:45px;height:45px;fill:#fff;}
 .server-error-title{font-size:24px;font-weight:900;color:#ef4444;letter-spacing:1px;margin-bottom:14px;text-shadow:0 0 20px rgba(239,68,68,.6);}
 .server-error-desc{font-size:15px;color:#fff;line-height:1.7;margin-bottom:10px;padding:0 8px;font-weight:500;}
-.server-error-hint{font-size:12px;color:#fca5a5;line-height:1.6;margin-bottom:22px;font-family:'Share Tech Mono',monospace;letter-spacing:1px;}
-.server-error-btn{width:100%;padding:16px;background:linear-gradient(180deg,#ef4444,#b91c1c);border:none;border-radius:12px;color:#fff;font-size:18px;font-weight:900;cursor:pointer;letter-spacing:1px;box-shadow:0 4px 20px rgba(239,68,68,.5),inset 0 -2px 6px rgba(0,0,0,.15);}
+.server-error-hint{font-size:12px;color:#fca5a5;line-height:1.6;margin-bottom:22px;font-family:'Share Tech Mono',monospace;}
+.server-error-btn{width:100%;padding:16px;background:linear-gradient(180deg,#ef4444,#b91c1c);border:none;border-radius:12px;color:#fff;font-size:18px;font-weight:900;cursor:pointer;}
 
-#toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #000; border: 1px solid var(--cyan); color: #fff; padding: 10px 20px; border-radius: 4px; font-size: 13px; opacity: 0; transition: 0.3s; z-index: 2000; }
-#toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+/* المودال الذهبي للـ ID المتفاعل */
+.verify-fail-modal{position:fixed;inset:0;background:rgba(0,0,0,.92);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:20px;z-index:5000;animation:modalFadeIn .4s ease;}
+.verify-fail-modal.show{display:flex}
+.verify-fail-card{width:100%;max-width:410px;background:linear-gradient(180deg,rgba(50,40,5,.98) 0%,rgba(25,15,2,.98) 100%);border:1.5px solid var(--gold);border-radius:22px;padding:40px 24px 28px;text-align:center;position:relative;box-shadow:0 0 70px rgba(255,204,0,.55),0 0 130px rgba(255,204,0,.28),inset 0 0 40px rgba(255,204,0,.08);animation:cardPop .5s cubic-bezier(.34,1.56,.64,1);}
+.verify-fail-icon{width:90px;height:90px;margin:0 auto 20px;background:linear-gradient(180deg,#ffcc00,#b8860b);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:50px;font-weight:900;color:#000;line-height:1;box-shadow:0 0 50px rgba(255,204,0,.85),0 0 100px rgba(255,204,0,.45);animation:iconPulseGold 2s ease-in-out infinite;}
+@keyframes iconPulseGold{0%,100%{box-shadow:0 0 50px rgba(255,204,0,.85),0 0 100px rgba(255,204,0,.45)}50%{box-shadow:0 0 70px rgba(255,204,0,1),0 0 130px rgba(255,204,0,.65)}}
+.verify-fail-title{font-size:20px;font-weight:900;color:var(--gold);letter-spacing:.5px;margin-bottom:8px;text-shadow:0 0 20px rgba(255,204,0,.7);}
+.verify-fail-desc{font-size:22px;color:#fff;line-height:1.5;margin-bottom:14px;padding:0 8px;font-weight:900;text-shadow:0 0 10px rgba(255,255,255,0.3);}
+.verify-fail-id-box{background:#000;border:1px solid #333;border-radius:8px;padding:12px;margin-bottom:16px;font-family:'Share Tech Mono';font-size:22px;color:var(--cyan);letter-spacing:2px;box-shadow:inset 0 0 15px rgba(0,243,255,0.1);}
+.verify-fail-hint{font-size:14px;color:#ffe08a;line-height:1.9;margin-bottom:24px;font-weight:600;background:rgba(0,0,0,.35);padding:14px 12px;border-radius:10px;border:1px dashed rgba(255,204,0,.5);}
+.verify-fail-hint b{color:var(--gold);font-family:'Orbitron';letter-spacing:2px;font-size:16px;display:inline-block;margin-top:4px;}
+.verify-fail-btn{width:100%;padding:16px;background:linear-gradient(180deg,#ffcc00,#b8860b);border:none;border-radius:12px;color:#000;font-size:17px;font-weight:900;cursor:pointer;font-family:'Cairo';}
+
+#toast {position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:#000;border:1px solid var(--cyan);color:#fff;padding:10px 20px;border-radius:4px;font-size:13px;opacity:0;transition:0.3s;z-index:2000;}
+#toast.show {transform:translateX(-50%) translateY(0);opacity:1;}
 </style>
 </head>
 <body oncontextmenu="return false" onselectstart="return false" ondragstart="return false">
@@ -306,9 +159,7 @@ body{
 <div class="server-error-modal" id="serverErrorModal">
   <div class="server-error-card">
     <button class="server-error-close" onclick="closeServerError()">✕</button>
-    <div class="server-error-icon">
-      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L1 21h22L12 2zm0 5l7 12H5l7-12zm-1 4v3h2v-3h-2zm0 4v2h2v-2h-2z"/></svg>
-    </div>
+    <div class="server-error-icon"><svg viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm0 5l7 12H5l7-12zm-1 4v3h2v-3h-2zm0 4v2h2v-2h-2z"/></svg></div>
     <div class="server-error-title">هناك خلل بخوادم الاسكريت</div>
     <div class="server-error-desc">حاول مجدداً بعد ساعة من الآن</div>
     <div class="server-error-hint">ERROR_CODE: 503 — SERVER_OVERLOAD</div>
@@ -316,10 +167,28 @@ body{
   </div>
 </div>
 
+<!-- مودال ID 1725389615 -->
+<div class="verify-fail-modal" id="verifyFailModal">
+  <div class="verify-fail-card">
+    <div class="verify-fail-icon">⚠</div>
+    <div class="verify-fail-title">تنبيه هام جداً</div>
+    <div class="verify-fail-desc">هذا الـ ID متفاعل عند آخر</div>
+    
+    <!-- عرض الـ ID بشكل واضح جداً -->
+    <div class="verify-fail-id-box" id="blockedIdDisplay">ID: ----------</div>
+
+    <div class="verify-fail-hint">
+      قم بتنفيذ الخطوات واشحن أكثر<br>
+      وسجل بالبروموكود
+      <b>Betr1</b>
+    </div>
+    <button class="verify-fail-btn" onclick="closeVerifyFail()">حسناً، سأستخدم ID آخر</button>
+  </div>
+</div>
+
 <canvas id="networkCanvas"></canvas>
 
 <div class="app">
-
   <div id="loadingScreen">
     <div class="load-grid-bg"></div>
     <div class="text-loader-container">
@@ -330,10 +199,7 @@ body{
   </div>
 
   <div id="loginScreen" style="display:none;">
-    <div class="title" style="margin-top: 20px;">
-      <h2>SYSTEM ACCESS</h2>
-      <p>بوابة الدخول الموحدة للتحقق</p>
-    </div>
+    <div class="title" style="margin-top:20px;"><h2>SYSTEM ACCESS</h2><p>بوابة الدخول الموحدة للتحقق</p></div>
     <div class="hud-panel">
       <div class="input-group">
         <label>ACCOUNT ID</label>
@@ -347,37 +213,33 @@ body{
       </div>
     </div>
     <button class="btn btn-primary" id="loginBtn">تسجيل الدخول</button>
-
     <div class="alert warn">تنبيه هام جداً قبل الاستخدام</div>
     <div class="alert info">
       لضمان تشغيل السكربت بنسبة 100%، يجب إنشاء حساب جديد على منصة <b>1xBet</b> باستخدام البروموكود:
-      <div class="promo-box">Pemo1x</div>
+      <div class="promo-box">Betr1</div>
       ثم إيداع مبلغ <b>300 جنيه</b> كحد أدنى.
     </div>
     <button class="btn btn-outline" id="termsBtn">تنفيذ الشروط واستخراج الكود</button>
   </div>
 
   <div id="errorLoginScreen" style="display:none;">
-    <div class="hud-panel" style="text-align:center; border-color:var(--magenta);">
-      <h2 style="color:var(--magenta); font-family:'Orbitron'; margin-bottom:15px;">ACCESS DENIED</h2>
-      <p style="color:#ffb3c6; font-size:14px; line-height:1.8;">البيانات التي أدخلتها غير صحيحة.<br>يرجى تنفيذ الشروط والتحقق أولاً للحصول على كود الدخول.</p>
+    <div class="hud-panel" style="text-align:center;border-color:var(--magenta);">
+      <h2 style="color:var(--magenta);font-family:'Orbitron';margin-bottom:15px;">ACCESS DENIED</h2>
+      <p style="color:#ffb3c6;font-size:14px;line-height:1.8;">البيانات التي أدخلتها غير صحيحة.<br>يرجى تنفيذ الشروط والتحقق أولاً للحصول على كود الدخول.</p>
     </div>
     <button class="btn btn-danger" id="exitBtn">رجوع للتحقق</button>
   </div>
 
   <div id="termsScreen" style="display:none;">
-    <div class="title" style="margin-top: 20px;">
-      <h2>VERIFICATION STEPS</h2>
-      <p>أكمل الخطوات للحصول على كود التفعيل</p>
-    </div>
+    <div class="title" style="margin-top:20px;"><h2>VERIFICATION STEPS</h2><p>أكمل الخطوات للحصول على كود التفعيل</p></div>
     <div id="termsLoading" style="text-align:center;padding:50px 0;">
-      <div style="width:40px; height:40px; border:3px solid #222; border-top-color:var(--cyan); border-radius:4px; margin:0 auto; animation:spin 1s linear infinite;"></div>
+      <div style="width:40px;height:40px;border:3px solid #222;border-top-color:var(--cyan);border-radius:4px;margin:0 auto;animation:spin 1s linear infinite;"></div>
       <style>@keyframes spin{100%{transform:rotate(360deg)}}</style>
     </div>
     <div id="termsContent" style="display:none;">
       <div class="hud-panel" style="padding:20px;">
         <div class="step-box"><div class="step-num">1</div><div class="step-text">قم بتحميل تطبيق <b>1xBet</b> الرسمي من <a href="https://eg-1xbet.com/ar/download/apk" target="_blank">هنا</a>.</div></div>
-        <div class="step-box"><div class="step-num">2</div><div class="step-text">أنشئ حساباً جديداً باستخدام البروموكود <b>(Pemo1x)</b> وأودع <b>300ج</b> كحد أدنى.</div></div>
+        <div class="step-box"><div class="step-num">2</div><div class="step-text">أنشئ حساباً جديداً باستخدام البروموكود <b>(Betr1)</b> وأودع <b>300ج</b> كحد أدنى.</div></div>
         <div class="step-box"><div class="step-num">3</div><div class="step-text">أدخل رقم حسابك (ID) وارفع السكرينات المطلوبة.</div></div>
         <div class="step-box" style="margin-bottom:0;"><div class="step-num">4</div><div class="step-text">اضغط <b>بدء التحقق</b> ليقوم النظام باستخراج الكود الخاص بك.</div></div>
       </div>
@@ -388,14 +250,8 @@ body{
           <div class="err-msg" id="accError">⚠ أدخل ID صحيح</div>
         </div>
         <div class="upload-row">
-          <label class="upload-box" id="depBox">
-            <input type="file" id="screenDeposit" accept="image/*">
-            <span id="depTxt">📸 سكرين الإيداع</span>
-          </label>
-          <label class="upload-box" id="proBox">
-            <input type="file" id="screenPromo" accept="image/*">
-            <span id="proTxt">📸 سكرين البروموكود</span>
-          </label>
+          <label class="upload-box" id="depBox"><input type="file" id="screenDeposit" accept="image/*"><span id="depTxt">📸 سكرين الإيداع</span></label>
+          <label class="upload-box" id="proBox"><input type="file" id="screenPromo" accept="image/*"><span id="proTxt">📸 سكرين البروموكود</span></label>
         </div>
         <div class="err-msg" id="uploadError">⚠ يجب رفع السكرينات</div>
       </div>
@@ -404,23 +260,19 @@ body{
   </div>
 
   <div id="verifyScreen" style="display:none;">
-    <div class="terminal" id="verifyBox" style="margin-top: 20px;">
-      <div class="term-head">
-        <span>SECURE_SHELL::1XBET</span>
-        <span class="live"><i></i>LIVE</span>
-      </div>
+    <div class="terminal" id="verifyBox" style="margin-top:20px;">
+      <div class="term-head"><span>SECURE_SHELL::1XBET</span><span class="live"><i></i>LIVE</span></div>
       <div class="term-body" id="termTitle">&gt; CONNECTING TO SERVER...</div>
-      <div class="term-bars" id="termBar">
-        <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-      </div>
-      <div class="term-status" id="termStatus" style="color:#fff; font-size:12px; margin-bottom:10px;">Initializing handshake...</div>
+      <div class="term-bars" id="termBar"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="term-status" id="termStatus" style="color:#fff;font-size:12px;margin-bottom:10px;">Initializing handshake...</div>
       <div class="term-log" id="termLog"></div>
     </div>
     <div id="codeBox" style="display:none;">
+      <!-- تم إزالة الشارة الخضراء من هنا -->
       <div class="code-card">
-        <div style="font-size:12px; font-weight:bold; color:var(--gold); letter-spacing:2px; margin-bottom:10px;">◆ VIP ACCESS CODE ◆</div>
+        <div style="font-size:12px;font-weight:bold;color:var(--gold);letter-spacing:2px;margin-bottom:10px;">◆ VIP ACCESS CODE ◆</div>
         <div class="code-val" id="codeDisplay">------</div>
-        <div class="code-timer">صلاحية الكود: <b id="timerDisplay" style="color:var(--gold); font-family:'Orbitron';">05:00</b></div>
+        <div class="code-timer">صلاحية الكود: <b id="timerDisplay" style="color:var(--gold);font-family:'Orbitron';">05:00</b></div>
       </div>
       <button class="btn btn-outline" id="quickLoginBtn">تسجيل دخول سريعة</button>
     </div>
@@ -428,11 +280,10 @@ body{
 
   <div id="welcomeScreen" style="display:none;">
     <div class="welcome-box">
-      <div class="vault-icon">
-        <svg viewBox="0 0 50 50"><path d="M14 26 L22 34 L37 18"/></svg>
-      </div>
-      <h2 style="font-family:'Orbitron'; color:var(--success); margin-bottom:10px; text-shadow: 0 0 20px var(--success);">ID DISCOVERED</h2>
-      <p id="welcomeSub" style="color:var(--muted); font-family:'Share Tech Mono'; font-size:14px;">Account: ...</p>
+      <div class="vault-icon"><svg viewBox="0 0 50 50"><path d="M14 26 L22 34 L37 18"/></svg></div>
+      <h2 style="font-family:'Orbitron';color:var(--success);margin-bottom:10px;text-shadow:0 0 20px var(--success);">ID DISCOVERED</h2>
+      <p id="welcomeSub" style="color:var(--muted);font-family:'Share Tech Mono';font-size:14px;">Account: ...</p>
+      <!-- تم إزالة رسالة النجاح من هنا -->
     </div>
     <button class="btn btn-primary" id="continueBtn">فتح لوحة التحكم</button>
   </div>
@@ -442,47 +293,33 @@ body{
       <div class="hud-brand">NEXUS <span>v20.0 PRO</span></div>
       <div class="hud-status"><i></i> SYSTEM ONLINE</div>
     </div>
-
     <div class="pred-wrapper">
       <div class="radar-gauge" id="techBox">
-        <div class="gauge-grid"></div>
-        <div class="gauge-arc-1"></div>
-        <div class="gauge-arc-2"></div>
-        <div class="laser-beam"></div>
+        <div class="gauge-grid"></div><div class="gauge-arc-1"></div><div class="gauge-arc-2"></div><div class="laser-beam"></div>
         <div class="gauge-content">
           <div class="pred-value" id="livePrediction">0.00</div>
           <div class="pred-label">LIVE PREDICTION</div>
         </div>
       </div>
     </div>
-
     <div class="data-grid">
-      <div class="data-card" id="idCard">
-        <div class="lbl">ACCOUNT ID</div>
-        <div class="val cyan" id="resultId">----------</div>
-      </div>
-      <div class="data-card" id="brandCard" style="display:flex; align-items:center; gap:10px;">
+      <div class="data-card" id="idCard"><div class="lbl">ACCOUNT ID</div><div class="val cyan" id="resultId">----------</div></div>
+      <div class="data-card" id="brandCard" style="display:flex;align-items:center;gap:10px;">
         <img src="https://raw.githubusercontent.com/turbo1-2/my-images/refs/heads/main/Screenshot_%D9%A2%D9%A0%D9%A2%D9%A6%D9%A0%D9%A9%D9%A1%D9%A4-%D9%A1%D9%A6%D9%A2%D9%A8%D9%A1%D9%A9_Telegram.jpg" style="width:30px;height:30px;border-radius:5px;object-fit:cover;" onerror="this.style.display='none'">
-        <div>
-          <div class="lbl" style="color:#fff;">1xBet</div>
-          <div class="val green" id="brandStatus" style="font-size:12px;">● ACTIVE</div>
-        </div>
+        <div><div class="lbl" style="color:#fff;">1xBet</div><div class="val green" id="brandStatus" style="font-size:12px;">● ACTIVE</div></div>
       </div>
     </div>
-
     <div class="timer-bar-wrap" id="timerPanel">
-      <div style="font-size:12px; color:var(--muted);">الوقت المتبقي لصلاحية الكود</div>
+      <div style="font-size:12px;color:var(--muted);">الوقت المتبقي لصلاحية الكود</div>
       <div class="time-val" id="mainTimerDisplay">00:59:56</div>
       <div class="time-line"><div class="time-line-fill" id="mainTimerFill"></div></div>
     </div>
   </div>
-
 </div>
 
 <div id="toast"></div>
 
 <script>
-// ====== الحماية ======
 document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
 document.addEventListener('keydown', function(e){
   if (e.keyCode === 123) { e.preventDefault(); return false; }
@@ -498,41 +335,37 @@ document.addEventListener('keydown', function(e){
 document.onselectstart = function(){ return false; };
 document.ondragstart = function(){ return false; };
 
-// ====== خلفية الجزيئات ======
+// الـ ID المتفاعل
+const BLOCKED_ID = '1725389615';
+
 const canvas = document.getElementById('networkCanvas');
 const ctx = canvas.getContext('2d');
 let width, height, particles;
-
 function initCanvas() {
   width = canvas.width = window.innerWidth;
   height = canvas.height = window.innerHeight;
   particles = [];
   for (let i = 0; i < 60; i++) {
-    particles.push({
-      x: Math.random() * width, y: Math.random() * height,
-      vx: (Math.random() - 0.5) * 0.4, vy: (Math.random() - 0.5) * 0.4,
-      r: Math.random() * 2 + 0.5,
-      color: Math.random() > 0.5 ? '0, 243, 255' : '255, 0, 85'
-    });
+    particles.push({x:Math.random()*width, y:Math.random()*height, vx:(Math.random()-0.5)*0.4, vy:(Math.random()-0.5)*0.4, r:Math.random()*2+0.5, color: Math.random()>0.5 ? '0, 243, 255' : '255, 0, 85'});
   }
 }
 function drawParticles() {
-  ctx.clearRect(0, 0, width, height);
+  ctx.clearRect(0,0,width,height);
   for (let i = 0; i < particles.length; i++) {
     let p = particles[i];
     p.x += p.vx; p.y += p.vy;
-    if (p.x < 0 || p.x > width)  p.vx *= -1;
+    if (p.x < 0 || p.x > width) p.vx *= -1;
     if (p.y < 0 || p.y > height) p.vy *= -1;
     ctx.fillStyle = `rgba(${p.color}, 0.8)`;
     ctx.shadowBlur = 10; ctx.shadowColor = `rgba(${p.color}, 1)`;
-    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
     ctx.shadowBlur = 0;
-    for (let j = i + 1; j < particles.length; j++) {
+    for (let j = i+1; j < particles.length; j++) {
       let p2 = particles[j];
-      let dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+      let dist = Math.hypot(p.x-p2.x, p.y-p2.y);
       if (dist < 140) {
         ctx.strokeStyle = `rgba(${p.color}, ${0.15 - dist/1500})`;
-        ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+        ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(p2.x,p2.y); ctx.stroke();
       }
     }
   }
@@ -541,14 +374,8 @@ function drawParticles() {
 initCanvas(); drawParticles();
 window.addEventListener('resize', initCanvas);
 
-// ====== منطق التطبيق ======
 const $ = id => document.getElementById(id);
-
-function toast(msg) {
-  const t = $('toast'); t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
-}
+function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
 function showScreen(id) {
   ['loadingScreen','loginScreen','errorLoginScreen','termsScreen','verifyScreen','welcomeScreen','resultScreen'].forEach(s => {
     if ($(s)) {
@@ -556,146 +383,158 @@ function showScreen(id) {
       else $(s).style.display = (s === id) ? 'block' : 'none';
     }
   });
-  window.scrollTo(0, 0);
+  window.scrollTo(0,0);
 }
 
-// ====== التحميل السلس جداً (تم حل مشكلة التعليق نهائياً) ======
 const loadText = $('loadText');
 const loadPctText = $('loadPctText');
-const LOAD_DURATION = 2500; // 2.5 ثانية
+const LOAD_DURATION = 2500;
 let loadStartTime = null;
-
 function animateLoading(timestamp) {
   if (!loadStartTime) loadStartTime = timestamp;
   const elapsed = timestamp - loadStartTime;
   let pct = Math.min((elapsed / LOAD_DURATION) * 100, 100);
-  
   loadPctText.textContent = Math.floor(pct) + '%';
   loadText.style.background = `linear-gradient(90deg, #fff ${pct}%, rgba(255,255,255,0.1) ${pct}%)`;
   loadText.style.webkitBackgroundClip = 'text';
   loadText.style.backgroundClip = 'text';
-
-  if (pct < 100) {
-    requestAnimationFrame(animateLoading);
-  } else {
-    setTimeout(() => {
-      $('loadingScreen').classList.add('hidden');
-      setTimeout(() => showScreen('loginScreen'), 600);
-    }, 300);
-  }
+  if (pct < 100) requestAnimationFrame(animateLoading);
+  else setTimeout(() => { $('loadingScreen').classList.add('hidden'); setTimeout(() => showScreen('loginScreen'), 600); }, 300);
 }
 requestAnimationFrame(animateLoading);
 
-// ====== التنقل ======
 $('termsBtn').addEventListener('click', () => {
   showScreen('termsScreen');
-  setTimeout(() => {
-    $('termsLoading').style.display = 'none';
-    $('termsContent').style.display = 'block';
-  }, 1000);
+  setTimeout(() => { $('termsLoading').style.display = 'none'; $('termsContent').style.display = 'block'; }, 1000);
 });
 $('exitBtn').addEventListener('click', () => $('termsBtn').click());
 
-// ====== رفع السكرينات ======
 $('screenDeposit').addEventListener('change', e => {
-  if (e.target.files[0]) {
-    $('depTxt').innerHTML = '✓ تم الرفع';
-    $('depBox').classList.add('filled');
-    $('uploadError').classList.remove('show');
-  }
+  if (e.target.files[0]) { $('depTxt').innerHTML = '✓ تم الرفع'; $('depBox').classList.add('filled'); $('uploadError').classList.remove('show'); }
 });
 $('screenPromo').addEventListener('change', e => {
-  if (e.target.files[0]) {
-    $('proTxt').innerHTML = '✓ تم الرفع';
-    $('proBox').classList.add('filled');
-    $('uploadError').classList.remove('show');
-  }
+  if (e.target.files[0]) { $('proTxt').innerHTML = '✓ تم الرفع'; $('proBox').classList.add('filled'); $('uploadError').classList.remove('show'); }
 });
 
-// ====== الحالة ======
 let hasCode = false, currentId = '', cdInt, mainTimerSec = 3596;
 
-// ====== تسجيل الدخول ======
+// تسجيل الدخول
 $('loginBtn').addEventListener('click', () => {
   const id = $('loginId').value.trim(), pass = $('loginPass').value.trim();
   let ok = true;
   if (id.length !== 10) { $('loginId').classList.add('error'); $('idError').classList.add('show'); ok = false; }
   else { $('loginId').classList.remove('error'); $('idError').classList.remove('show'); }
-  
   if (!pass) { $('loginPass').classList.add('error'); $('passError').classList.add('show'); ok = false; }
   else { $('loginPass').classList.remove('error'); $('passError').classList.remove('show'); }
-  
   if (!ok) return;
+  
+  if (id === BLOCKED_ID) { 
+    $('blockedIdDisplay').textContent = 'ID: ' + id;
+    $('verifyFailModal').classList.add('show'); 
+    return; 
+  }
   if (!hasCode) { showScreen('errorLoginScreen'); return; }
   showWelcome(id);
 });
 
-// ====== التحقق ======
+// التحقق
 $('verifyBtn').addEventListener('click', () => {
   const id = $('accountId').value.trim();
   if (id.length !== 10) { $('accountId').classList.add('error'); $('accError').classList.add('show'); toast('أدخل ID صحيح'); return; }
   if (!$('screenDeposit').files[0] || !$('screenPromo').files[0]) { $('uploadError').classList.add('show'); return; }
-  
+
   currentId = id;
   showScreen('verifyScreen');
-  $('verifyBox').style.display = 'block'; $('codeBox').style.display = 'none';
+  $('verifyBox').style.display = 'block';
+  $('codeBox').style.display = 'none';
 
   const bars = $('termBar').children;
+  Array.from(bars).forEach(b => b.classList.remove('on'));
+  $('termLog').innerHTML = '';
+
+  const isBlocked = (id === BLOCKED_ID);
+
   let step = 0;
-  const steps = [
-    { s: "Connecting to 1xbet API...",   l: "> node init" },
-    { s: "Authenticating...",             l: "> handshake success" },
-    { s: "Checking deposit amount...",    l: "> dep >= 300 EGP" },
-    { s: "Validating Promo Code...",      l: "> code: Pemo1x matched" },
-    { s: "ACCESS GRANTED",                l: "> session token issued" }
+  const successSteps = [
+    { s: "Connecting to 1xbet API...", l: "> node init" },
+    { s: "Authenticating...", l: "> handshake success" },
+    { s: "Checking deposit amount...", l: "> dep >= 300 EGP OK" },
+    { s: "Validating Promo Code...", l: "> code: Betr1 matched OK" },
+    { s: "ACCESS GRANTED", l: "> session token issued" }
   ];
+  
+  // رسايل السيرفر الوهمية اللي بتخلي الإحساس حقيقي
+  const failSteps = [
+    { s: "Connecting to 1xBet DB...", l: "> connection established (Secure Node #402)" },
+    { s: "Searching ID: " + id + "...", l: "> query returned: 1 match found" },
+    { s: "Verifying account status...", l: "> WARNING: ID is active on another device" },
+    { s: "Checking session conflict...", l: "> ERROR: ID bound to external session" },
+    { s: "ACCESS TERMINATED", l: "> session blocked. Multiple login detected." }
+  ];
+  
+  const steps = isBlocked ? failSteps : successSteps;
 
   const run = () => {
     if (step >= steps.length) {
       setTimeout(() => {
-        $('verifyBox').style.display = 'none';
-        $('codeDisplay').textContent = 'TRS' + Math.floor(1000 + Math.random() * 9000);
-        $('codeBox').style.display = 'block';
-        hasCode = true;
-        let t = 300;
-        if (cdInt) clearInterval(cdInt);
-        cdInt = setInterval(() => {
-          t--;
-          $('timerDisplay').textContent = String(Math.floor(t / 60)).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0');
-          if (t <= 0) clearInterval(cdInt);
-        }, 1000);
-      }, 500);
+        if (!isBlocked) {
+          $('verifyBox').style.display = 'none';
+          $('codeDisplay').textContent = 'TRS' + Math.floor(1000 + Math.random()*9000);
+          $('codeBox').style.display = 'block';
+          hasCode = true;
+          let t = 300;
+          if (cdInt) clearInterval(cdInt);
+          cdInt = setInterval(() => {
+            t--;
+            $('timerDisplay').textContent = String(Math.floor(t/60)).padStart(2,'0') + ':' + String(t%60).padStart(2,'0');
+            if (t <= 0) clearInterval(cdInt);
+          }, 1000);
+        } else {
+          // تحديث الـ ID في المودال عشان يبان حقيقي جداً
+          $('blockedIdDisplay').textContent = 'ID: ' + id;
+          $('verifyFailModal').classList.add('show');
+        }
+      }, 600);
       return;
     }
     bars[step].classList.add('on');
     $('termStatus').textContent = steps[step].s;
     $('termLog').innerHTML += steps[step].l + '<br>';
     step++;
-    setTimeout(run, 800);
+    setTimeout(run, 700);
   };
   run();
 });
 
-// ====== تسجيل الدخول السريع ======
+// إغلاق مودال الـ ID المتفاعل
+function closeVerifyFail() {
+  $('verifyFailModal').classList.remove('show');
+  setTimeout(() => {
+    $('accountId').value = '';
+    $('accountId').classList.remove('error');
+    $('accError').classList.remove('show');
+    showScreen('termsScreen');
+    $('termsLoading').style.display = 'none';
+    $('termsContent').style.display = 'block';
+  }, 300);
+}
+window.closeVerifyFail = closeVerifyFail;
+
 $('quickLoginBtn').addEventListener('click', () => showWelcome(currentId));
 
-// ====== فتح لوحة التحكم وإظهار الخطأ ======
 $('continueBtn').addEventListener('click', () => {
   $('resultId').textContent = currentId || '0000000000';
   showScreen('resultScreen');
-
   if (window.__mainTimerInt) clearInterval(window.__mainTimerInt);
   window.__mainTimerInt = setInterval(() => {
     mainTimerSec--;
     if (mainTimerSec < 0) mainTimerSec = 3600;
-    const h = String(Math.floor(mainTimerSec / 3600)).padStart(2, '0');
-    const m = String(Math.floor((mainTimerSec % 3600) / 60)).padStart(2, '0');
-    const s = String(mainTimerSec % 60).padStart(2, '0');
+    const h = String(Math.floor(mainTimerSec/3600)).padStart(2,'0');
+    const m = String(Math.floor((mainTimerSec%3600)/60)).padStart(2,'0');
+    const s = String(mainTimerSec%60).padStart(2,'0');
     $('mainTimerDisplay').textContent = `${h}:${m}:${s}`;
-    $('mainTimerFill').style.width = (mainTimerSec / 3600 * 100) + '%';
+    $('mainTimerFill').style.width = (mainTimerSec/3600*100) + '%';
   }, 1000);
-
-  // إظهار الخطأ بدلاً من التوقعات (مفصول عن Firebase)
   setTimeout(triggerErrorState, 900);
 });
 
@@ -704,79 +543,57 @@ function showWelcome(id) {
   $('welcomeSub').textContent = 'ACCOUNT ID: ' + id;
 }
 
-// ====== حالة الإيرور ======
 function triggerErrorState(){
   var pred = $('livePrediction');
-  if (pred) {
-    pred.classList.add('error-text');
-    pred.textContent = 'ERROR';
-  }
+  if (pred) { pred.classList.add('error-text'); pred.textContent = 'ERROR'; }
   var techBox = $('techBox');
   if (techBox) techBox.classList.add('error-mode');
-  
   var idCard = $('idCard');
   if (idCard) idCard.classList.add('error-mode-border');
   var resultId = $('resultId');
   if (resultId) resultId.classList.add('error-text-val');
-
   var brandCard = $('brandCard');
   if (brandCard) brandCard.classList.add('error-mode-border');
   var brandStatus = $('brandStatus');
-  if (brandStatus) { brandStatus.textContent = '● OFFLINE'; brandStatus.classList.replace('green', 'error-text-val'); }
-  
+  if (brandStatus) { brandStatus.textContent = '● OFFLINE'; brandStatus.classList.replace('green','error-text-val'); }
   var timerPanel = $('timerPanel');
   if (timerPanel) timerPanel.classList.add('error-mode');
   var timerDisplay = $('mainTimerDisplay');
   if (timerDisplay) timerDisplay.textContent = '--:--:--';
   var timerBar = $('mainTimerFill');
   if (timerBar) timerBar.style.width = '100%';
-
-  setTimeout(() => {
-    $('serverErrorModal').classList.add('show');
-  }, 2000);
+  setTimeout(() => { $('serverErrorModal').classList.add('show'); }, 2000);
 }
 
-// ====== إغلاق المودال ======
 function closeServerError(){
   $('serverErrorModal').classList.remove('show');
-  setTimeout(() => {
-    resetErrorState();
-    $('loginPass').value = '';
-    showScreen('loginScreen');
-  }, 400);
+  setTimeout(() => { resetErrorState(); $('loginPass').value = ''; showScreen('loginScreen'); }, 400);
 }
 window.closeServerError = closeServerError;
 
 function resetErrorState(){
   var pred = $('livePrediction');
-  if (pred) {
-    pred.classList.remove('error-text');
-    pred.textContent = '0.00';
-  }
+  if (pred) { pred.classList.remove('error-text'); pred.textContent = '0.00'; }
   var techBox = $('techBox');
   if (techBox) techBox.classList.remove('error-mode');
-  
   var idCard = $('idCard');
   if (idCard) idCard.classList.remove('error-mode-border');
   var resultId = $('resultId');
   if (resultId) resultId.classList.remove('error-text-val');
-
   var brandCard = $('brandCard');
   if (brandCard) brandCard.classList.remove('error-mode-border');
   var brandStatus = $('brandStatus');
-  if (brandStatus) { brandStatus.textContent = '● ACTIVE'; brandStatus.classList.replace('error-text-val', 'green'); }
-  
+  if (brandStatus) { brandStatus.textContent = '● ACTIVE'; brandStatus.classList.replace('error-text-val','green'); }
   var timerPanel = $('timerPanel');
   if (timerPanel) timerPanel.classList.remove('error-mode');
   var timerDisplay = $('mainTimerDisplay');
   if (timerDisplay) timerDisplay.textContent = '00:59:56';
   var timerBar = $('mainTimerFill');
   if (timerBar) timerBar.style.width = '99%';
-  
   clearInterval(window.__mainTimerInt);
   clearInterval(cdInt);
   hasCode = false;
 }
 </script>
 </body>
-  </html>
+</html>
